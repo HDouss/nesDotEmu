@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * BVS operation.
+ * BVS operation. Can return 0, 1 or 2 as additional cycles.
  * @author hdouss
  *
  */

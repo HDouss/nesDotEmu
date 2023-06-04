@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * AND operation.
+ * AND operation. Bitwise AND.
  * @author hdouss
  *
  */

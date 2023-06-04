@@ -5,7 +5,10 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * ADC operation.
+ * ADC operation. Carry flag updated depending if the result is > 255. Overflow is set to true
+ * if the actual result is &gt; 127 or &lt;-128. This is detected by checking if the two operands
+ * are of the same sign and the result is of a different sign (after being wrapped in the interval
+ * -128 -> 127).
  * @author hdouss
  *
  */
