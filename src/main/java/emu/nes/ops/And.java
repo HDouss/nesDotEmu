@@ -1,0 +1,24 @@
+package emu.nes.ops;
+
+import emu.nes.addressing.AddressingResult;
+import emu.nes.cpu.Bus;
+import emu.nes.cpu.Registers;
+
+/**
+ * AND operation.
+ * @author hdouss
+ *
+ */
+public class And implements Operation {
+
+    @Override
+    public int execute(Registers registers, Bus bus, AddressingResult res) {
+        int data = res.getData();
+        final int acc = registers.getAcc();
+        final int result = acc & data;
+        updateFlags(registers, result);
+        registers.setAcc(result);
+        return res.isCrossed() ? 1 : 0;
+    }
+
+}
