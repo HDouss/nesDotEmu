@@ -5,7 +5,10 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * SBC operation. CPU status negative and zero flags are set according to the new shifted value.
+ * SBC operation. CPU status negative and zero flags are set according to the substraction result.
+ * Carry flag is set if a 'borrow' was not needed for the substraction.
+ * This is the case if the result as a byte is positive.
+ * Overflow is set if the substraction gives a result outside the byte range; i.e &lt-128.
  * @author hdouss
  *
  */
@@ -15,12 +18,13 @@ public class SubtractCarry implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = res.getData();
         final int acc = registers.getAcc();
-        int result = (byte) acc - (byte) data - 1 + (registers.getStatus().carry() ? 1 : 0);
-        final byte asByte = (byte) result;
+        final int carry = registers.getStatus().carry() ? 1 : 0;
+        final int byteSubstraction = (byte) acc - (byte) data - 1 + carry;
+        final byte result = (byte) byteSubstraction;
         updateFlags(registers, result);
-        registers.getStatus().setCarry(asByte >= 0);
+        registers.getStatus().setCarry(result >= 0);
         registers.setAcc(result & 0xFF);
-        registers.getStatus().setOverflow(result * asByte < 0);
+        registers.getStatus().setOverflow(byteSubstraction < -128);
         return res.isCrossed() ? 1 : 0;
     }
 
