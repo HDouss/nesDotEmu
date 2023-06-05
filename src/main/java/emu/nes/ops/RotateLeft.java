@@ -5,7 +5,9 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * ROL operation.
+ * ROL operation. CPU status negative and zero flags are set according to the new rotated value.
+ * The implementation detects if the value read and to be updated is the accumulator value by
+ * checking if AddressingResult.getAddress() returns 0.
  * @author hdouss
  *
  */

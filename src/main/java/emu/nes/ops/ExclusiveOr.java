@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * EOR operation.
+ * EOR operation. Bitwise XOR operation.  CPU status negative and zero flags are set according to the XOR result.
  * @author hdouss
  *
  */

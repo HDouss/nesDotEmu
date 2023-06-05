@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * JSP operation.
+ * JSR operation. Writes current PC to the stack before jump.  
  * @author hdouss
  *
  */

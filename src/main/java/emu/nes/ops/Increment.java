@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * INC operation.
+ * INC operation. CPU status negative and zero flags are set according to the new (incremented) value.
  * @author hdouss
  *
  */

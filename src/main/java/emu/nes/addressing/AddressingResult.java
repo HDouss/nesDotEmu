@@ -26,7 +26,8 @@ public class AddressingResult {
     }
 
     /**
-     * Get the address from which the data was fetched.
+     * Get the address from which the data was fetched. This is either the memory address
+     * or 0 if the data was not retrieved from memory, but from a CPU register.
      * @return The address
      */
     public int getAddress() {

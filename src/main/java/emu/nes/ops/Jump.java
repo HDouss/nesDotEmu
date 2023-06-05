@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * JMP operation.
+ * JMP operation. Jumps to the address calculated by the addressing mode.
  * @author hdouss
  *
  */

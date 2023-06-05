@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * TXA operation.
+ * TXA operation. CPU status negative and zero flags are set according to the new accumulator value.
  * @author hdouss
  *
  */

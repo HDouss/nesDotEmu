@@ -6,7 +6,10 @@ import emu.nes.cpu.Registers;
 import emu.nes.cpu.Status;
 
 /**
- * LSR operation.
+ * LSR operation. CPU status negative and zero flags are set according to the new shifted value.
+ * Carry flag is set if the original bit 0 value is set.
+ * The implementation detects if the value read and to be updated is the accumulator value by
+ * checking if AddressingResult.getAddress() returns 0.
  * @author hdouss
  *
  */

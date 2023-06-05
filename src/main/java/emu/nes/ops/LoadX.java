@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * LDX operation.
+ * LDX operation. CPU status negative and zero flags are set according to the new X value.
  * @author hdouss
  *
  */

@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * PHP operation.
+ * PHP operation. Status pushed to the stack is forced to have 1 in bits 4 and 5.
  * @author hdouss
  *
  */

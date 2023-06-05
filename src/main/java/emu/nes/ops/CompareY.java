@@ -6,7 +6,7 @@ import emu.nes.cpu.Registers;
 import emu.nes.cpu.Status;
 
 /**
- * CPY operation.
+ * CPY operation. Flags are set with the same logic as {@link Compare} operation.
  * @author hdouss
  *
  */

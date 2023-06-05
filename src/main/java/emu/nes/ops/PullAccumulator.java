@@ -5,7 +5,7 @@ import emu.nes.cpu.Bus;
 import emu.nes.cpu.Registers;
 
 /**
- * PLA operation.
+ * PLA operation. CPU status negative and zero flags are set according to the new accumulator value.
  * @author hdouss
  *
  */

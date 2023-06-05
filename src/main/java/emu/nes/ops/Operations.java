@@ -344,14 +344,30 @@ public class Operations {
         addInstruction(0xFF, Operations.XXX, 1);
     }
 
+    /**
+     * Gets the operation by OPCode.
+     * @param inst OPCode
+     * @return Operation corresponding to the OPCode
+     */
     public static Operation get(int inst) {
         return Operations.operations.get(inst);
     }
 
+    /**
+     * Gets the cycles needed for the passed OPCode to execute.
+     * @param inst OPCode
+     * @return Cycles needed for the passed OPCode
+     */
     public static int cycles(int inst) {
         return Operations.cycles.get(inst);
     }
 
+    /**
+     * Adds a mapping between the OPCode, the operation and the cycles count.
+     * @param inst OPCode
+     * @param ops Operation
+     * @param count Cycles needed for the operation to execute
+     */
     private static void addInstruction(int inst, Operation ops, int count) {
         Operations.operations.put(inst, ops);
         Operations.cycles.put(inst, count);

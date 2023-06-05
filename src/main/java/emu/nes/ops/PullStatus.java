@@ -6,7 +6,7 @@ import emu.nes.cpu.Registers;
 import emu.nes.cpu.Status;
 
 /**
- * PLP operation.
+ * PLP operation. Status 4th and 5th bits are not changed and forced to remain with their value before pulling. 
  * @author hdouss
  *
  */
