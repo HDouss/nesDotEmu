@@ -7,7 +7,7 @@ import emu.nes.cpu.Status;
 
 /**
  * CMP operation. Carry flag is set if accumulator is greater than memory data (as integers).
- * Negative flag is set if accumulator is lower than memory data (as bytes) 
+ * Negative flag is set if accumulator is lower than memory data (as bytes).
  * @author hdouss
  *
  */
