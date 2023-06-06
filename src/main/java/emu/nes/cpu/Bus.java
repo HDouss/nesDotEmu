@@ -28,22 +28,22 @@ public class Bus {
     /**
      * PPU.
      */
-    private PPU ppu;
+    private PPU ppu = new PPU();
 
     /**
      * DMA.
      */
-    private DMA dma;
+    private DMA dma = new DMA();
 
     /**
      * APU.
      */
-    private APU apu;
+    private APU apu = new APU();
 
     /**
      * Normally disabled adresses.
      */
-    private Test test;
+    private Test test = new Test();
 
     /**
      * Connects the bus to the cartridge, or to void.
