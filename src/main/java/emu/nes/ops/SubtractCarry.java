@@ -18,11 +18,11 @@ public class SubtractCarry implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = res.getData();
         final int acc = registers.getAcc();
-        final int carry = registers.getStatus().carry() ? 1 : 0;
-        final int byteSubstraction = (byte) acc - (byte) data - 1 + carry;
+        final int operand = data + 1 - (registers.getStatus().carry() ? 1 : 0);
+        final int byteSubstraction = (byte) acc - (byte) operand;
         final byte result = (byte) byteSubstraction;
         updateFlags(registers, result);
-        registers.getStatus().setCarry(result >= 0);
+        registers.getStatus().setCarry(acc >= operand);
         registers.setAcc(result & 0xFF);
         registers.getStatus().setOverflow(byteSubstraction < -128);
         return res.isCrossed() ? 1 : 0;
