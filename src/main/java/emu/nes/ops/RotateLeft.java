@@ -18,6 +18,7 @@ public class RotateLeft implements Operation {
         int data = (res.getData() << 1) | (registers.getStatus().carry() ? 1 : 0);
         int addr = res.getAddress();
         updateFlags(registers, data);
+        registers.getStatus().setCarry(data > 0xFF);
         if (addr == 0) {
             registers.setAcc(data & 0xFF);
         } else {
