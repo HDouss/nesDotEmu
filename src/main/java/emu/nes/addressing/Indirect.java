@@ -13,20 +13,23 @@ public class Indirect implements Addressing {
 
     @Override
     public AddressingResult address(Bus bus, Registers registers, int pc) {
-        int plow = bus.read(pc + 1);
-        int phigh = bus.read(pc + 2);
-        int addrP = plow | (phigh << 8);
-        int low = bus.read(addrP);
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        int plow = bus.read(pc + 1) & 0xFF;
+        int phigh = bus.read(pc + 2) & 0xFF;
+        int addrP = plow + (phigh << 8);
+         // data implicitly converted to integers, consider only 8 bits for addressing
+        int low = bus.read(addrP) & 0xFF;
         int high = 0;
         if (plow == 0xFF) {
             // simulate hardware bug
-            high = bus.read(phigh << 8);
+            high = bus.read(phigh << 8) & 0xFF;
         } else {
-            high = bus.read(addrP + 1);
+            // plow < 0xFF so the above addition cannot overflow
+            high = bus.read(addrP + 1) & 0xFF;
         }
         registers.setPc(pc + 3);
         AddressingResult result = new AddressingResult();
-        result.address = low | (high << 8);
+        result.address = low + (high << 8);
         return result;
     }
 

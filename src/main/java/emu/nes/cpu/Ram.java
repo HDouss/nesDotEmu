@@ -9,15 +9,15 @@ import emu.nes.Memory;
  */
 public class Ram implements Memory {
 
-    private int[] data = new int[2048];
+    private byte[] data = new byte[2048];
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.data[addr & 0x7ff];
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         this.data[addr & 0x7ff] = value;
     }
 

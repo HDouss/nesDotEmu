@@ -10,17 +10,17 @@ public class Registers {
     /**
      * 8 bits accumulator.
      */
-    private int acc;
+    private byte acc;
 
     /**
      * 8 bits x register.
      */
-    private int x;
+    private byte x;
 
     /**
      * 8 bits y register.
      */
-    private int y;
+    private byte y;
 
     /**
      * 16 bits program counter.
@@ -30,7 +30,7 @@ public class Registers {
     /**
      * 8 bits stack pointer.
      */
-    private int stack = 0xFD;
+    private byte stack = (byte) 0xFD;
 
     /**
      * 8 (actually 6 useful) bits status flags.
@@ -41,7 +41,7 @@ public class Registers {
      * Accumulator getter.
      * @return Accumulator value
      */
-    public int getAcc() {
+    public byte getAcc() {
         return acc;
     }
 
@@ -49,7 +49,7 @@ public class Registers {
      * Accumulator setter.
      * @param acc Accumulator value to set
      */
-    public void setAcc(int acc) {
+    public void setAcc(byte acc) {
         this.acc = acc;
     }
 
@@ -57,7 +57,7 @@ public class Registers {
      * X register getter.
      * @return X register value
      */
-    public int getX() {
+    public byte getX() {
         return x;
     }
 
@@ -65,7 +65,7 @@ public class Registers {
      * X register setter.
      * @param x X register value to set
      */
-    public void setX(int x) {
+    public void setX(byte x) {
         this.x = x;
     }
 
@@ -73,7 +73,7 @@ public class Registers {
      * Y register getter.
      * @return Y register value
      */
-    public int getY() {
+    public byte getY() {
         return y;
     }
 
@@ -81,7 +81,7 @@ public class Registers {
      * Y register setter.
      * @param y Y register value to set
      */
-    public void setY(int y) {
+    public void setY(byte y) {
         this.y = y;
     }
 
@@ -90,7 +90,7 @@ public class Registers {
      * @return Program counter value
      */
     public int getPc() {
-        return pc;
+        return this.pc;
     }
 
     /**
@@ -98,14 +98,14 @@ public class Registers {
      * @param pc Program counter value to set
      */
     public void setPc(int pc) {
-        this.pc = pc;
+        this.pc = pc & 0xFFFF;
     }
 
     /**
      * Stack value getter.
      * @return Stack value
      */
-    public int getStack() {
+    public byte getStack() {
         return stack;
     }
 
@@ -113,7 +113,7 @@ public class Registers {
      * Stack value setter.
      * @param stack Stack value to set
      */
-    public void setStack(int stack) {
+    public void setStack(byte stack) {
         this.stack = stack;
     }
 
@@ -140,7 +140,7 @@ public class Registers {
         this.acc = 0;
         this.x = 0;
         this.y = 0;
-        this.stack = 0xFD;
+        this.stack = (byte) 0xFD;
         this.status.setStatus(0x24);
     }
 

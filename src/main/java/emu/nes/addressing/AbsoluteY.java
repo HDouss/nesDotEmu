@@ -13,11 +13,14 @@ public class AbsoluteY implements Addressing {
 
     @Override
     public AddressingResult address(Bus bus, Registers registers, int pc) {
-        int high = bus.read(pc + 2);
-        int low = bus.read(pc + 1);
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        int high = bus.read(pc + 2) & 0xFF;
+        int low = bus.read(pc + 1) & 0xFF;
         registers.setPc(pc + 3);
-        final int addr = registers.getY() + (low | (high << 8));
-        final int data = bus.read(addr & 0xFFFF);
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        final int addr = (registers.getY() & 0xFF) + low + (high << 8);
+        // addition result may overflow
+        final byte data = bus.read(addr & 0xFFFF);
         AddressingResult result = new AddressingResult();
         result.address = addr;
         result.data = data;

@@ -13,7 +13,7 @@ public class TransferStackX implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = registers.getStack();
+        byte data = registers.getStack();
         updateFlags(registers, data);
         registers.setX(data);
         return 0;

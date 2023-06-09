@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class Operations {
 
-    private static Map<Integer, Operation> operations = new HashMap<>();
-    private static Map<Integer, Integer> cycles = new HashMap<>();
+    private static Map<Byte, Operation> operations = new HashMap<>();
+    private static Map<Byte, Integer> cycles = new HashMap<>();
     private static final Operation BRK = new Break();
     private static final Operation ORA = new InclusiveOr();
     private static final Operation XXX = new Unknown();
@@ -359,7 +359,7 @@ public class Operations {
      * @param inst OPCode
      * @return Operation corresponding to the OPCode
      */
-    public static Operation get(int inst) {
+    public static Operation get(byte inst) {
         return Operations.operations.get(inst);
     }
 
@@ -368,7 +368,7 @@ public class Operations {
      * @param inst OPCode
      * @return Cycles needed for the passed OPCode
      */
-    public static int cycles(int inst) {
+    public static int cycles(byte inst) {
         return Operations.cycles.get(inst);
     }
 
@@ -379,8 +379,8 @@ public class Operations {
      * @param count Cycles needed for the operation to execute
      */
     private static void addInstruction(int inst, Operation ops, int count) {
-        Operations.operations.put(inst, ops);
-        Operations.cycles.put(inst, count);
+        Operations.operations.put((byte) inst, ops);
+        Operations.cycles.put((byte) inst, count);
     }
 
 }

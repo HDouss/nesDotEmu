@@ -13,8 +13,9 @@ public class PushAccumulator implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int stack = registers.getStack();
-        bus.write(0x0100 + stack, registers.getAcc());
+        byte stack = registers.getStack();
+        // stack implicitly converted to integer, consider only 8 bits for stack address
+        bus.write(0x0100 + (stack & 0xFF), registers.getAcc());
         stack--;
         registers.setStack(stack);
         return 0;

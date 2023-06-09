@@ -15,7 +15,7 @@ public class ZeroPageX implements Addressing {
     public AddressingResult address(Bus bus, Registers registers, int pc) {
         registers.setPc(pc + 2);
         final int addr = (bus.read(pc + 1) + registers.getX()) & 0xFF;
-        final int data = bus.read(addr);
+        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
         result.data = data;

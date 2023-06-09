@@ -12,12 +12,12 @@ public interface Memory {
      * @param addr Address to read from
      * @return Value stored in the passed address
      */
-    public int read(final int addr);
+    public byte read(final int addr);
 
     /**
      * Writes a value to an address.
      * @param addr Address to write to
      * @param value Value to write
      */
-    public void write(final int addr, final int value);
+    public void write(final int addr, final byte value);
 }

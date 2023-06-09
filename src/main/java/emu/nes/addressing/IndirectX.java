@@ -13,12 +13,16 @@ public class IndirectX implements Addressing {
 
     @Override
     public AddressingResult address(Bus bus, Registers registers, int pc) {
-        int location = (bus.read(pc + 1) + registers.getX()) & 0xFF;
-        int low = bus.read(location);
-        int high = bus.read((location + 1) & 0xFF);
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        final int location = (bus.read(pc + 1) & 0xFF) + (registers.getX() & 0xFF);
+        final int zeroPage = location & 0xFF;
+        final int nextZeroPage = (zeroPage + 1) & 0xFF;
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        int low = bus.read(zeroPage) & 0xFF;
+        int high = bus.read(nextZeroPage) & 0xFF;
         registers.setPc(pc + 2);
         final int addr = low | (high << 8);
-        final int data = bus.read(addr);
+        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
         result.data = data;

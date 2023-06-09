@@ -14,7 +14,7 @@ public class DecrementX implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = registers.getX() - 1;
-        registers.setX(data & 0xFF);
+        registers.setX((byte) data);
         updateFlags(registers, data);
         return 0;
     }

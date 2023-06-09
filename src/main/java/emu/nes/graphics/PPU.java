@@ -29,12 +29,12 @@ public class PPU implements Memory {
     }
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.registers.read((addr - 0x2000) % 8);
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         this.registers.write((addr - 0x2000) % 8, value);
     }
 

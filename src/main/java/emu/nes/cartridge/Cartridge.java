@@ -19,12 +19,12 @@ public class Cartridge implements Memory {
     }
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.content.read(addr);
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         this.content.write(addr, value);
     }
 

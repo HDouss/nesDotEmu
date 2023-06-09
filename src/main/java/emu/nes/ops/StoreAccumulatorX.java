@@ -14,7 +14,7 @@ public class StoreAccumulatorX implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int addr = res.getAddress();
-        bus.write(addr, registers.getAcc() & registers.getX());
+        bus.write(addr, (byte) (registers.getAcc() & registers.getX()));
         return 0;
     }
 

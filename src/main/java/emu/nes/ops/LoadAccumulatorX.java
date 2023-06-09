@@ -13,7 +13,7 @@ public class LoadAccumulatorX implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
+        byte data = res.getData();
         registers.setAcc(data);
         registers.setX(data);
         updateFlags(registers, data);

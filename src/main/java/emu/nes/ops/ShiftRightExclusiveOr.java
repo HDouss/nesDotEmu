@@ -13,15 +13,16 @@ public class ShiftRightExclusiveOr implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData() >> 1;
+        // shifting converts implicitly to integer, consider only 8 bits 
+        int data = (res.getData() & 0xFF) >> 1;
         int addr = res.getAddress();
         if (addr != 0) {
-            bus.write(addr, data & 0xFF);
+            bus.write(addr, (byte) data);
         }
         registers.getStatus().setCarry((res.getData() & 0x1) > 0);
         int result = data ^ registers.getAcc();
         updateFlags(registers, result);
-        registers.setAcc(result);
+        registers.setAcc((byte) result);
         return 0;
     }
 

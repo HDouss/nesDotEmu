@@ -14,8 +14,8 @@ public class IncrementY implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = registers.getY() + 1;
-        registers.setY(data & 0xFF);
-        updateFlags(registers, data);
+        registers.setY((byte) data);
+        updateFlags(registers, (byte) data);
         return 0;
     }
 

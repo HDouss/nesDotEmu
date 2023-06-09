@@ -13,7 +13,7 @@ public class TransferYAccumulator implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = registers.getY();
+        byte data = registers.getY();
         updateFlags(registers, data);
         registers.setAcc(data);
         return 0;

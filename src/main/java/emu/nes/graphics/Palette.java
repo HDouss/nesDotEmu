@@ -10,13 +10,13 @@ public class Palette implements Memory {
     byte[] data = new byte[0x20];
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.data[(addr - 0x3F00) % 0x20];
     }
 
     @Override
-    public void write(int addr, int value) {
-        this.data[(addr - 0x3F00) % 0x20] = (byte) value;
+    public void write(int addr, byte value) {
+        this.data[(addr - 0x3F00) % 0x20] = value;
     }
 
 }

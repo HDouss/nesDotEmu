@@ -14,7 +14,7 @@ public class Mapper000 extends AbstractMapper {
     }
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         if (addr < 0x6000) {
             throw new RuntimeException("Illegal read address:" + addr);
         }
@@ -25,11 +25,11 @@ public class Mapper000 extends AbstractMapper {
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         if (addr < 0x6000 || addr > 0x7FFF) {
             throw new RuntimeException("Illegal write address:" + addr);
         }
-        this.ram[(addr - 0x6000) % this.ramSize] = (byte) value;
+        this.ram[(addr - 0x6000) % this.ramSize] = value;
     }
 
 }

@@ -13,11 +13,11 @@ public class And implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
+        byte data = res.getData();
         final int acc = registers.getAcc();
         final int result = acc & data;
         updateFlags(registers, result);
-        registers.setAcc(result);
+        registers.setAcc((byte) result);
         return res.isCrossed() ? 1 : 0;
     }
 

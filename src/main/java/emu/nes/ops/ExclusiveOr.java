@@ -15,7 +15,7 @@ public class ExclusiveOr implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = res.getData() ^ registers.getAcc();
         updateFlags(registers, data);
-        registers.setAcc(data);
+        registers.setAcc((byte) data);
         return res.isCrossed() ? 1 : 0;
     }
 

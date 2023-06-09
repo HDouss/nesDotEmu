@@ -33,7 +33,7 @@ public class Cpu {
             System.out.println(String.format("%s CYC:%s", this, this.cycleCount));
             final int pc = this.registers.getPc();
             this.registers.setPc(pc + 1);
-            int inst = this.bus.read(pc);
+            byte inst = this.bus.read(pc);
             AddressingResult data = Addressings.get(inst).address(this.bus, this.registers, pc);
             this.remaining = Operations.cycles(inst)
                 + Operations.get(inst).execute(this.registers, this.bus, data);
@@ -48,7 +48,7 @@ public class Cpu {
     public void on() {
         int lsb = this.bus.read(0xFFFC);
         int msb = this.bus.read(0xFFFD);
-        this.registers.setPc(lsb | (msb << 8));
+        this.registers.setPc((lsb & 0xFF) | (msb << 8));
         // for nestest
         this.registers.setPc(0xC000);
     }

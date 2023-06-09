@@ -19,12 +19,12 @@ public class NES20 implements Content {
     }
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.mapper.read(addr);
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         this.mapper.write(addr, value);
     }
 

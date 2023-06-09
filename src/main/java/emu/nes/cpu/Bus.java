@@ -61,15 +61,15 @@ public class Bus {
         return this.cartridge;
     }
 
-    public int read(final int addr) {
+    public byte read(final int addr) {
         Optional<? extends Memory> selected = this.memory(addr);
         if (selected.isPresent()) {
-            return selected.get().read(addr) & 0xFF;
+            return selected.get().read(addr);
         }
         return 0;
     }
 
-    public void write(final int addr, final int value) {
+    public void write(final int addr, final byte value) {
         Optional<? extends Memory> selected = this.memory(addr);
         if (selected.isPresent()) {
             selected.get().write(addr, value);

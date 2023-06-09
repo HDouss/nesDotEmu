@@ -10,13 +10,13 @@ public class Nametable implements Memory {
     byte[] data = new byte[1024 * 4];
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.data[(addr - 0x2000) % 0x1000];
     }
 
     @Override
-    public void write(int addr, int value) {
-        this.data[(addr - 0x2000) % 0x1000] = (byte) value;
+    public void write(int addr, byte value) {
+        this.data[(addr - 0x2000) % 0x1000] = value;
     }
 
 }

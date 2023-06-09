@@ -14,10 +14,11 @@ public class CompareX implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
+        byte data = res.getData();
         Status status = registers.getStatus();
-        int x = registers.getX();
-        status.setCarry(x >= data);
+        byte x = registers.getX();
+        // comparison as 8 bit integers
+        status.setCarry((x & 0xFF) >= (data & 0xFF));
         status.setZero((x & 0xFF) == (data & 0xFF));
         status.setNegative((byte) (x - data) < 0);
         return 0;

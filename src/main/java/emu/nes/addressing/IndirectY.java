@@ -14,15 +14,17 @@ public class IndirectY implements Addressing {
 
     @Override
     public AddressingResult address(Bus bus, Registers registers, int pc) {
-        final int pageZeroAddr = bus.read(pc + 1);
-        final int y = registers.getY();
-        final int add = bus.read(pageZeroAddr) + y;
+        final int pageZeroAddr = bus.read(pc + 1) & 0xFF;
+        final int nextZeroPage = (pageZeroAddr + 1) & 0xFF;
+        // data implicitly converted to integers, consider only 8 bits for addressing
+        final int y = registers.getY() & 0xFF;
+        final int add = (bus.read(pageZeroAddr) & 0xFF) + y;
         int low = add & 0xFF;
         int carry = add >> 8;
-        int high = (carry + bus.read((pageZeroAddr + 1) & 0xFF)) & 0xFF;
+        int high = (carry + bus.read(nextZeroPage)) & 0xFF;
         registers.setPc(pc + 2);
         final int addr = low | (high << 8);
-        final int data = bus.read(addr);
+        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
         result.data = data;

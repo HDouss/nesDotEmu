@@ -10,13 +10,13 @@ public class PPURegisters implements Memory {
     byte[] memory = new byte[8];
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.memory[addr];
     }
 
     @Override
-    public void write(int addr, int value) {
-        this.memory[addr] = (byte) value;
+    public void write(int addr, byte value) {
+        this.memory[addr] = value;
     }
     
     public byte getControl() {

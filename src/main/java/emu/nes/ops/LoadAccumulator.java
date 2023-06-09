@@ -14,7 +14,7 @@ public class LoadAccumulator implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = res.getData();
-        registers.setAcc(data);
+        registers.setAcc((byte) data);
         updateFlags(registers, data);
         return res.isCrossed() ? 1 : 0;
     }

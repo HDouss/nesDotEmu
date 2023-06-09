@@ -5,7 +5,7 @@ public class AddressingResult {
     /**
      * Fetched data.
      */
-    protected int data;
+    protected byte data;
 
     /**
      * Address from which the data was fetched.
@@ -21,7 +21,7 @@ public class AddressingResult {
      * Get the data fetched.
      * @return The data
      */
-    public int getData() {
+    public byte getData() {
         return data;
     }
 

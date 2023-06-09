@@ -14,12 +14,13 @@ public class DecrementCompare implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
+        byte data = res.getData();
         int result = (data - 1) & 0xFF;
-        bus.write(res.getAddress(), result);
+        bus.write(res.getAddress(), (byte) result);
         Status status = registers.getStatus();
-        int acc = registers.getAcc();
-        status.setCarry(acc >= result);
+        byte acc = registers.getAcc();
+        // comparison as 8 bit integers
+        status.setCarry((acc & 0xFF) >= result);
         status.setZero((acc & 0xFF) == (result & 0xFF));
         status.setNegative((byte) (acc - result) < 0);
         return 0;

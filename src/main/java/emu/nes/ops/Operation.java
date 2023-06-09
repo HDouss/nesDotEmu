@@ -28,7 +28,6 @@ public interface Operation {
      */
     default void updateFlags(Registers registers, int data) {
         final Status status = registers.getStatus();
-        // should it be data & 0xFF?
         status.setZero((data & 0xFF) == 0);
         status.setNegative((data & 0x80) > 0);
     }

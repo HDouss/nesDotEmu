@@ -13,7 +13,7 @@ public class LoadX implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
+        byte data = res.getData();
         registers.setX(data);
         updateFlags(registers, data);
         return res.isCrossed() ? 1 : 0;

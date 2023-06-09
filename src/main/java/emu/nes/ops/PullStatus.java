@@ -14,9 +14,10 @@ public class PullStatus implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int stack = registers.getStack();
+        byte stack = registers.getStack();
         stack++;
-        int data = bus.read(0x0100 + stack);
+        // stack implicitly converted to integer, consider only 8 bits for stack address
+        byte data = bus.read(0x0100 + (stack & 0xFF));
         final Status status = registers.getStatus();
         status.setStatus((data & 0xCF) | (status.status() & 0x30));
         registers.setStack(stack);

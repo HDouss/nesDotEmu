@@ -18,14 +18,15 @@ public class ShiftRight implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         final Status status = registers.getStatus();
-        int data = res.getData() >> 1;
+        // shifting converts to int, so consider only 8 bits
+        int data = (res.getData() & 0xFF) >> 1;
         int addr = res.getAddress();
         updateFlags(registers, data);
         status.setCarry((res.getData() & 0x1) > 0);
         if (addr == 0) {
-            registers.setAcc(data & 0xFF);
+            registers.setAcc((byte) data);
         } else {
-            bus.write(addr, data & 0xFF);
+            bus.write(addr, (byte) data);
         }
         return 0;
     }

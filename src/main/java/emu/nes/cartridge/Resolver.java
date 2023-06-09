@@ -25,12 +25,12 @@ public class Resolver implements Content {
     }
 
     @Override
-    public int read(int addr) {
+    public byte read(int addr) {
         return this.rom.read(addr);
     }
 
     @Override
-    public void write(int addr, int value) {
+    public void write(int addr, byte value) {
         this.rom.write(addr, value);
     }
 

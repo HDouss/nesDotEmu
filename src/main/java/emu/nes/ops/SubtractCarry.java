@@ -16,14 +16,14 @@ public class SubtractCarry implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
-        final int acc = registers.getAcc();
+        byte data = res.getData();
+        final byte acc = registers.getAcc();
         final int operand = data + 1 - (registers.getStatus().carry() ? 1 : 0);
-        final int byteSubstraction = (byte) acc - (byte) operand;
+        final int byteSubstraction = acc - (byte) operand;
         final byte result = (byte) byteSubstraction;
         updateFlags(registers, result);
-        registers.getStatus().setCarry(acc >= operand);
-        registers.setAcc(result & 0xFF);
+        registers.getStatus().setCarry((acc & 0xFF) >= (operand & 0xFF));
+        registers.setAcc((byte) result);
         registers.getStatus().setOverflow(byteSubstraction < -128);
         return res.isCrossed() ? 1 : 0;
     }

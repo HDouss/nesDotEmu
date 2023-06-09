@@ -14,7 +14,7 @@ public class DecrementY implements Operation {
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int data = registers.getY() - 1;
-        registers.setY(data & 0xFF);
+        registers.setY((byte) data);
         updateFlags(registers, data);
         return 0;
     }

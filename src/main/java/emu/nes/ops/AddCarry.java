@@ -16,15 +16,16 @@ public class AddCarry implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData();
-        final int acc = registers.getAcc();
+        byte data = res.getData();
+        final byte acc = registers.getAcc();
         final int carry = registers.getStatus().carry() ? 1 : 0;
-        final int result = acc + data + carry;
-        final int byteAddition = (byte) acc + (byte) data + carry;
+        // data implicitly converted to integers, consider only 8 bits for integer addition
+        final int result = (acc & 0xFF) + (data & 0xFF) + carry;
+        final int byteAddition = acc + data + carry;
         updateFlags(registers, result);
         registers.getStatus().setCarry(result > 0xFF);
         registers.getStatus().setOverflow(byteAddition > 127 || byteAddition < -128);
-        registers.setAcc(result & 0xFF);
+        registers.setAcc((byte) result);
         return res.isCrossed() ? 1 : 0;
     }
 

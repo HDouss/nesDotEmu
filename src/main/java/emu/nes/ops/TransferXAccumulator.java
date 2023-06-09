@@ -13,7 +13,7 @@ public class TransferXAccumulator implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = registers.getX();
+        byte data = registers.getX();
         updateFlags(registers, data);
         registers.setAcc(data);
         return 0;

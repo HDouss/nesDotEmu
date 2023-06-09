@@ -15,10 +15,11 @@ public class JumpSubroutine implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int pc = registers.getPc() - 1;
         registers.setPc(res.getAddress());
-        int stack = registers.getStack();
-        bus.write(0x0100 + stack, (pc >> 8) & 0xFF);
+        byte stack = registers.getStack();
+        // stack implicitly converted to integer, consider only 8 bits for stack address
+        bus.write(0x0100 + (stack & 0xFF), (byte) (pc >> 8));
         stack--;
-        bus.write(0x0100 + stack, pc & 0xFF);
+        bus.write(0x0100 + (stack & 0xFF), (byte) pc);
         stack--;
         registers.setStack(stack);
         return 0;

@@ -13,15 +13,17 @@ public class ShiftLeftOr implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int data = res.getData() << 1;
-        int result = data | registers.getAcc();
+        // shifting converts implicitly to integer, consider only 8 bits
+        int data = (res.getData() & 0xFF) << 1;
+        // bitwise operation converts implicitly to integer, consider only 8 bits
+        int result = data | (registers.getAcc() & 0xFF);
         updateFlags(registers, result);
         int addr = res.getAddress();
         if (addr != 0) {
-            bus.write(addr, data & 0xFF);
+            bus.write(addr, (byte) data);
         }
         registers.getStatus().setCarry(result > 0xFF);
-        registers.setAcc(result & 0xFF);
+        registers.setAcc((byte) result);
         return 0;
     }
 

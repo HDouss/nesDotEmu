@@ -12,11 +12,12 @@ public class Absolute implements Addressing {
 
     @Override
     public AddressingResult address(Bus bus, Registers registers, int pc) {
-        int high = bus.read(pc + 2);
-        int low = bus.read(pc + 1);
+        byte high = bus.read(pc + 2);
+        byte low = bus.read(pc + 1);
         registers.setPc(pc + 3);
-        final int addr = low | (high << 8);
-        final int data = bus.read(addr & 0xFFFF);
+        // data implicitly converted to integers, consider only 8 bits
+        final int addr = (low & 0xFF) | ((high & 0xFF) << 8);
+        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
         result.data = data;

@@ -13,9 +13,10 @@ public class PullAccumulator implements Operation {
 
     @Override
     public int execute(Registers registers, Bus bus, AddressingResult res) {
-        int stack = registers.getStack();
+        byte stack = registers.getStack();
         stack++;
-        int data = bus.read(0x0100 + stack);
+        // stack implicitly converted to integer, consider only 8 bits for stack address
+        byte data = bus.read(0x0100 + (stack & 0xFF));
         updateFlags(registers, data);
         registers.setAcc(data);
         registers.setStack(stack);
