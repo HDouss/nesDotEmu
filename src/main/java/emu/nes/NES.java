@@ -4,6 +4,7 @@ import emu.nes.cartridge.Cartridge;
 import emu.nes.cpu.Bus;
 import emu.nes.cpu.Cpu;
 import emu.nes.graphics.PPU;
+import emu.nes.graphics.PPUBus;
 import java.util.Optional;
 
 public class NES {
@@ -33,11 +34,17 @@ public class NES {
      */
     private Cpu cpu;
 
+    /**
+     * PPU Bus.
+     */
+    private PPUBus ppubus;
+
     public NES() throws InterruptedException {
         this.running = false;
         this.bus = new Bus();
+        this.ppubus = new PPUBus();
         this.cpu = new Cpu(this.bus);
-        this.clock = new Clock(this.cpu, new PPU());
+        this.clock = new Clock(this.cpu, new PPU(this.ppubus));
         this.cartridge = Optional.empty();
     }
 
@@ -48,6 +55,7 @@ public class NES {
         this.running = !this.running;
         if (this.running) {
             this.bus.insert(this.cartridge);
+            this.ppubus.insert(this.cartridge);
             this.cpu.on();
             this.clock.start();
         } else {
@@ -63,6 +71,7 @@ public class NES {
     public void eject() {
         this.cartridge = Optional.empty();
         this.bus.insert(this.cartridge);
+        this.ppubus.insert(this.cartridge);
     }
 
     public void reset() {

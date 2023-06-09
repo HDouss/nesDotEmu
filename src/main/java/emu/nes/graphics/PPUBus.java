@@ -1,52 +1,33 @@
-package emu.nes.cpu;
+package emu.nes.graphics;
 
-import emu.nes.DMA;
-import emu.nes.Memory;
-import emu.nes.Test;
-import emu.nes.cartridge.Cartridge;
-import emu.nes.graphics.PPU;
-import emu.nes.sound.APU;
 import java.util.Optional;
+import emu.nes.Memory;
+import emu.nes.cartridge.Cartridge;
 
 /**
- * CPU Bus logic.
+ * PPU Bus logic.
  * @author hdouss
  *
  */
-public class Bus {
+public class PPUBus {
 
     /**
      * Optionally a connected cartridge.
      */
     private Optional<Cartridge> cartridge;
-
+    
     /**
-     * RAM.
+     * Nametable RAM (2KB).
      */
-    private Ram ram = new Ram();
+    private Nametable nametable;
 
     /**
-     * PPU.
+     * Palette RAM (256B).
      */
-    private PPU ppu;
+    private Palette palette;
 
     /**
-     * DMA.
-     */
-    private DMA dma = new DMA();
-
-    /**
-     * APU.
-     */
-    private APU apu = new APU();
-
-    /**
-     * Normally disabled adresses.
-     */
-    private Test test = new Test();
-
-    /**
-     * Connects the bus to the cartridge, or to void.
+     * Connects the ppu bus to the cartridge, or to void.
      * @param cartridge Cartridge or void to connect
      */
     public void insert(Optional<Cartridge> cartridge) {
@@ -84,24 +65,14 @@ public class Bus {
     private Optional<? extends Memory> memory(int addr) {
         Optional<Memory> result = Optional.empty();
         if (addr < 0x2000) {
-            return Optional.of(this.ram);
-        }
-        if (addr < 0x4000) {
-            return Optional.of(this.ppu);
-        }
-        if (addr == 0x4014) {
-            return Optional.of(this.dma);
-        }
-        if (addr < 0x4018) {
-            return Optional.of(this.apu);
-        }
-        if (addr < 0x4020) {
-            return Optional.of(this.test);
-        }
-        if (addr < 0x10000) {
             return this.cartridge;
+        }
+        if (addr < 0x3F00) {
+            return Optional.of(this.nametable);
+        }
+        if (addr == 0x4000) {
+            return Optional.of(this.palette);
         }
         return result;
     }
-
 }

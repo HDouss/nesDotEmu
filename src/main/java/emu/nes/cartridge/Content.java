@@ -9,4 +9,5 @@ import emu.nes.Memory;
  */
 public interface Content extends Memory {
 
+
 }

@@ -1,6 +1,5 @@
 package emu.nes.cartridge;
 
-import emu.nes.Memory;
 
 /**
  * Cartridge mapper interface. Acts as a memory for read/write operations for CPU and PPU.
@@ -8,7 +7,7 @@ import emu.nes.Memory;
  * @author hdouss
  *
  */
-public interface Mapper extends Memory {
+public interface Mapper extends Content {
 
     /**
      * Sets trainer data.
@@ -63,5 +62,6 @@ public interface Mapper extends Memory {
      * @param size Non volatile CHR RAM size
      */
     public void setNVCHRAMSize(final int size);
+
 
 }

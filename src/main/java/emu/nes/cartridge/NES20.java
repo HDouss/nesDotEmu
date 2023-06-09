@@ -3,7 +3,7 @@ package emu.nes.cartridge;
 import java.util.Arrays;
 
 /**
- * Implements NES 2.0 ROM file format.
+ * Implements NES 2.0 ROM file format. Delegates read/write CPU and PPU operations to the mapper.
  * @author hdouss
  *
  */
