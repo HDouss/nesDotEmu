@@ -23,6 +23,8 @@
  */
 package emu.nes.nestest;
 
+import emu.nes.NES;
+import emu.nes.cartridge.Cartridge;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -30,18 +32,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import emu.nes.NES;
-import emu.nes.cartridge.Cartridge;
 
 /**
  * Runs Nestest and compare only CPU results.
@@ -78,9 +74,11 @@ public final class NesTestCPU {
     public void testsCPU()
         throws IOException, URISyntaxException, InterruptedException {
         final NES nes = new NES();
-        nes.insert(new Cartridge(
-            Paths.get(ClassLoader.getSystemResource("classic/nestest.nes").toURI())
-        ));
+        nes.insert(
+            new Cartridge(
+                Paths.get(ClassLoader.getSystemResource("classic/nestest.nes").toURI())
+            )
+        );
         List<String> expected = Files.readAllLines(
             Paths.get(ClassLoader.getSystemResource("classic/expected-nesdotemu.log").toURI())
         );
@@ -92,7 +90,7 @@ public final class NesTestCPU {
             String check = outContent.toString();
             String[] lines = check.split(System.getProperty("line.separator"));
             int total = lines.length - 1;
-            total = total > expected.size() ? expected.size() : total; 
+            total = total > expected.size() ? expected.size() : total;
             for (int idx = read; idx < total; ++idx) {
                 Assert.assertEquals(expected.get(idx), lines[idx]);
             }
@@ -112,7 +110,7 @@ public final class NesTestCPU {
         System.setOut(originalOut);
         System.setErr(originalErr);
     }
-    
+
     @BeforeClass
     public static void setUpDaemon() {
         daemon = new Thread(
@@ -127,10 +125,10 @@ public final class NesTestCPU {
         daemon.start();
     }
 
+    @SuppressWarnings("deprecation")
     @AfterClass
     public static void killDaemon() {
         daemon.stop();
     }
 
-    
 }

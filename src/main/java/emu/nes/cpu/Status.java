@@ -10,9 +10,9 @@ public class Status {
     /**
      * 8 bits status flags.
      */
-    private int status;
+    private byte status;
 
-    public Status(int st) {
+    public Status(byte st) {
         this.status = st;
     }
 
@@ -84,7 +84,7 @@ public class Status {
      * Modifies the status register value.
      * @param status Status value to set
      */
-    public void setStatus(int status) {
+    public void setStatus(byte status) {
         this.status = status;
     }
 

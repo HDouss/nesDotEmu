@@ -19,7 +19,7 @@ public class PullStatus implements Operation {
         // stack implicitly converted to integer, consider only 8 bits for stack address
         byte data = bus.read(0x0100 + (stack & 0xFF));
         final Status status = registers.getStatus();
-        status.setStatus((data & 0xCF) | (status.status() & 0x30));
+        status.setStatus((byte) ((data & 0xCF) | (status.status() & 0x30)));
         registers.setStack(stack);
         return 0;
     }

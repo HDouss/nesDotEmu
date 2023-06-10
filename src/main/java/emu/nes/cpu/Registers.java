@@ -35,7 +35,7 @@ public class Registers {
     /**
      * 8 (actually 6 useful) bits status flags.
      */
-    private Status status = new Status(0x24);
+    private Status status = new Status((byte) 0x24);
 
     /**
      * Accumulator getter.
@@ -141,7 +141,7 @@ public class Registers {
         this.x = 0;
         this.y = 0;
         this.stack = (byte) 0xFD;
-        this.status.setStatus(0x24);
+        this.status.setStatus((byte) 0x24);
     }
 
     @Override

@@ -23,9 +23,9 @@ public class PPU implements Memory {
      */
     private OAM oam;
 
-
     public PPU(PPUBus bus) {
         this.bus = bus;
+        this.oam = new OAM();
     }
 
     @Override
@@ -43,4 +43,9 @@ public class PPU implements Memory {
 
     }
 
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return super.toString() + this.bus.toString() + this.oam.toString();
+    }
 }

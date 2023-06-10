@@ -19,7 +19,7 @@ public class ReturnInterrupt implements Operation {
         // stack implicitly converted to integer, consider only 8 bits for stack address
         byte flags = bus.read(0x0100 + (stack & 0xFF));
         final Status status = registers.getStatus();
-        status.setStatus((flags & 0xCF) | (status.status() & 0x30));
+        status.setStatus((byte) ((flags & 0xCF) | (status.status() & 0x30)));
         stack++;
         byte pclow = bus.read(0x0100 + (stack & 0xFF));
         stack++;
