@@ -11,10 +11,24 @@ import emu.nes.ops.Operations;
  */
 public class Cpu {
 
+    /**
+     * CPU Bus.
+     */
     private Bus bus;
+
+    /**
+     * CPU registers.
+     */
     private Registers registers;
+
+    /**
+     * Remaining cycles to wait before executing the next instruction.
+     */
     private int remaining = 0;
 
+    /**
+     * Total cycles count.
+     */
     int cycleCount = 7;
 
     public Cpu(Bus bus) {

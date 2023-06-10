@@ -1,6 +1,6 @@
 package emu.nes.graphics;
 
-import emu.nes.Memory;
+import emu.nes.memory.Memory;
 
 /**
  * PPU logic.

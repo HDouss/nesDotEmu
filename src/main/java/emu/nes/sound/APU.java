@@ -1,6 +1,6 @@
 package emu.nes.sound;
 
-import emu.nes.Memory;
+import emu.nes.memory.Memory;
 
 /**
  * APU logic.

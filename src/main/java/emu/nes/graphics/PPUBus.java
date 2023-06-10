@@ -1,78 +1,44 @@
 package emu.nes.graphics;
 
-import java.util.Optional;
-import emu.nes.Memory;
 import emu.nes.cartridge.Cartridge;
+import emu.nes.memory.Memory;
+import emu.nes.memory.MirroredByteMemory;
+import emu.nes.memory.SelectorByteMemory;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * PPU Bus logic.
  * @author hdouss
  *
  */
-public class PPUBus {
+public class PPUBus extends SelectorByteMemory {
+
+    public PPUBus() {
+        super(PPUBus.memoryMap());
+    }
 
     /**
-     * Optionally a connected cartridge.
-     */
-    private Optional<Cartridge> cartridge;
-    
-    /**
-     * Nametable RAM (2KB).
-     */
-    private Nametable nametable;
-
-    /**
-     * Palette RAM (256B).
-     */
-    private Palette palette;
-
-    /**
-     * Connects the ppu bus to the cartridge, or to void.
+     * Connects the bus to the cartridge, or to void.
      * @param cartridge Cartridge or void to connect
      */
     public void insert(Optional<Cartridge> cartridge) {
-        this.cartridge = cartridge;
-    }
-
-    /**
-     * Accessor to the cartridge.
-     * @return Connected cartridge
-     */
-    public Optional<Cartridge> cartridge() {
-        return this.cartridge;
-    }
-
-    public byte read(final int addr) {
-        Optional<? extends Memory> selected = this.memory(addr);
-        if (selected.isPresent()) {
-            return selected.get().read(addr);
-        }
-        return 0;
-    }
-
-    public void write(final int addr, final byte value) {
-        Optional<? extends Memory> selected = this.memory(addr);
-        if (selected.isPresent()) {
-            selected.get().write(addr, value);
+        this.memories().remove(0x0000);
+        if (cartridge.isPresent()) {
+            this.memories().put(0x0000, cartridge.get());
         }
     }
 
     /**
-     * Selects the correct memory depending on the address.
-     * @param addr Memory address
-     * @return The memory corresponding to the address.
+     * Builds the memory map for the PPU.
+     * @return A memory map for the PPU
      */
-    private Optional<? extends Memory> memory(int addr) {
-        Optional<Memory> result = Optional.empty();
-        if (addr < 0x2000) {
-            return this.cartridge;
-        }
-        if (addr < 0x3F00) {
-            return Optional.of(this.nametable);
-        }
-        if (addr == 0x4000) {
-            return Optional.of(this.palette);
-        }
+    private static Map<Integer, Memory> memoryMap() {
+        Map<Integer, Memory> result = new HashMap<>();
+        result.put(0x2000, new MirroredByteMemory(0x1000, 0x1000));
+        result.put(0x3F00, new MirroredByteMemory(0x0020, 0x0020));
         return result;
     }
+
 }

@@ -1,11 +1,14 @@
 package emu.nes.cpu;
 
-import emu.nes.DMA;
-import emu.nes.Memory;
 import emu.nes.Test;
 import emu.nes.cartridge.Cartridge;
 import emu.nes.graphics.PPU;
+import emu.nes.memory.Memory;
+import emu.nes.memory.MirroredByteMemory;
+import emu.nes.memory.SelectorByteMemory;
 import emu.nes.sound.APU;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -13,94 +16,33 @@ import java.util.Optional;
  * @author hdouss
  *
  */
-public class Bus {
+public class Bus extends SelectorByteMemory {
 
-    /**
-     * Optionally a connected cartridge.
-     */
-    private Optional<Cartridge> cartridge;
-
-    /**
-     * RAM.
-     */
-    private Ram ram = new Ram();
-
-    /**
-     * PPU.
-     */
-    private PPU ppu;
-
-    /**
-     * DMA.
-     */
-    private DMA dma = new DMA();
-
-    /**
-     * APU.
-     */
-    private APU apu = new APU();
-
-    /**
-     * Normally disabled adresses.
-     */
-    private Test test = new Test();
+    public Bus(PPU ppu) {
+        super(Bus.memoryMap(ppu));
+    }
 
     /**
      * Connects the bus to the cartridge, or to void.
      * @param cartridge Cartridge or void to connect
      */
     public void insert(Optional<Cartridge> cartridge) {
-        this.cartridge = cartridge;
-    }
-
-    /**
-     * Accessor to the cartridge.
-     * @return Connected cartridge
-     */
-    public Optional<Cartridge> cartridge() {
-        return this.cartridge;
-    }
-
-    public byte read(final int addr) {
-        Optional<? extends Memory> selected = this.memory(addr);
-        if (selected.isPresent()) {
-            return selected.get().read(addr);
-        }
-        return 0;
-    }
-
-    public void write(final int addr, final byte value) {
-        Optional<? extends Memory> selected = this.memory(addr);
-        if (selected.isPresent()) {
-            selected.get().write(addr, value);
+        this.memories().remove(0x4020);
+        if (cartridge.isPresent()) {
+            this.memories().put(0x4020, cartridge.get());
         }
     }
 
     /**
-     * Selects the correct memory depending on the address.
-     * @param addr Memory address
-     * @return The memory corresponding to the address.
+     * Builds the memory map for the CPU.
+     * @return A memory map for the CPU
      */
-    private Optional<? extends Memory> memory(int addr) {
-        Optional<Memory> result = Optional.empty();
-        if (addr < 0x2000) {
-            return Optional.of(this.ram);
-        }
-        if (addr < 0x4000) {
-            return Optional.of(this.ppu);
-        }
-        if (addr == 0x4014) {
-            return Optional.of(this.dma);
-        }
-        if (addr < 0x4018) {
-            return Optional.of(this.apu);
-        }
-        if (addr < 0x4020) {
-            return Optional.of(this.test);
-        }
-        if (addr < 0x10000) {
-            return this.cartridge;
-        }
+    private static Map<Integer, Memory> memoryMap(PPU ppu) {
+        Map<Integer, Memory> result = new HashMap<>();
+        result.put(0x0000, new MirroredByteMemory(0x800, 0x800));
+        result.put(0x2000, ppu);
+        result.put(0x4000, new APU());
+        result.put(0x4018, new Test());
         return result;
     }
 

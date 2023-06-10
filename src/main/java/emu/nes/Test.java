@@ -1,5 +1,7 @@
 package emu.nes;
 
+import emu.nes.memory.Memory;
+
 /**
  * Responds to read/write from/to addresses 0x4018 to 0x401F (inclusive),
  * normally disabled but could be used for testing purposes.

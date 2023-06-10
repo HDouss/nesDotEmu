@@ -1,5 +1,7 @@
 package emu.nes;
 
+import emu.nes.memory.Memory;
+
 /**
  * DMA logic for dumping memory to the PPU. This happens when 0x4014 address is written to. 
  * @author hdouss

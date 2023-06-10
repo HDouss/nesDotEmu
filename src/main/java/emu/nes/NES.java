@@ -41,10 +41,11 @@ public class NES {
 
     public NES() throws InterruptedException {
         this.running = false;
-        this.bus = new Bus();
         this.ppubus = new PPUBus();
+        final PPU ppu = new PPU(this.ppubus);
+        this.bus = new Bus(ppu);
         this.cpu = new Cpu(this.bus);
-        this.clock = new Clock(this.cpu, new PPU(this.ppubus));
+        this.clock = new Clock(this.cpu, ppu);
         this.cartridge = Optional.empty();
     }
 

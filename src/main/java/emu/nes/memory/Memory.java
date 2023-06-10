@@ -1,4 +1,4 @@
-package emu.nes;
+package emu.nes.memory;
 
 /**
  * Memory abstraction describing all chips that can be read from and written to.
