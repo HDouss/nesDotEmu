@@ -149,8 +149,8 @@ public abstract class AbstractMapper implements Mapper {
     private byte[] getPixelBytes(final byte[] raw) {
         byte[] tile = new byte[AbstractMapper.TILE_PIXELS];
         for (int idx = 0; idx < 8; ++idx) {
-            final byte lsb = raw[idx];
-            final byte msb = raw[idx + AbstractMapper.TILE_PIXELS / 8];
+            final int lsb = raw[idx] & 0xFF;
+            final int msb = raw[idx + AbstractMapper.TILE_PIXELS / 8] & 0xFF;
             for (int pix = 0; pix < 8; ++pix) {
                 tile[idx * 8 + pix] = (byte) (
                     ((lsb >> (7 - pix)) % 2) + 2 * ((msb >> (7 - pix)) % 2)
