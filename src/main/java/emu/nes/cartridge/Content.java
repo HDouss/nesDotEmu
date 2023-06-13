@@ -1,5 +1,6 @@
 package emu.nes.cartridge;
 
+import emu.nes.graphics.Tile;
 import emu.nes.memory.Memory;
 
 /**
@@ -8,6 +9,8 @@ import emu.nes.memory.Memory;
  *
  */
 public interface Content extends Memory {
+
+    Tile getTile(final int bank, final int num);
 
 
 }

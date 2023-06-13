@@ -15,6 +15,8 @@ import java.util.Optional;
  */
 public class PPUBus extends SelectorByteMemory {
 
+    private Optional<Cartridge> cartridge;
+
     public PPUBus() {
         super(PPUBus.memoryMap());
     }
@@ -25,11 +27,20 @@ public class PPUBus extends SelectorByteMemory {
      */
     public void insert(Optional<Cartridge> cartridge) {
         this.memories().remove(0x0000);
+        this.cartridge = cartridge;
         if (cartridge.isPresent()) {
             this.memories().put(0x0000, cartridge.get());
         }
     }
 
+    
+    public Tile getTile(final int bank, final int num) {
+        if (this.cartridge.isPresent()) {
+            return this.cartridge.get().getTile(bank, num);
+        } else {
+            return new Tile(new byte[0]);
+        }
+    }
     /**
      * Builds the memory map for the PPU.
      * @return A memory map for the PPU

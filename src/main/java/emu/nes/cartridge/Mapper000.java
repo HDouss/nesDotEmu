@@ -1,5 +1,7 @@
 package emu.nes.cartridge;
 
+import emu.nes.graphics.Tile;
+
 /***
  * Mapper 000 implementation.
  * @author hdouss
@@ -30,6 +32,11 @@ public class Mapper000 extends AbstractMapper {
             throw new RuntimeException("Illegal write address:" + addr);
         }
         this.ram[(addr - 0x6000) % this.ramSize] = value;
+    }
+
+    @Override
+    public Tile getTile(int bank, int num) {
+        return this.tiles[256 * bank + num];
     }
 
 }

@@ -1,6 +1,7 @@
 package emu.nes.cartridge;
 
 import java.util.Arrays;
+import emu.nes.graphics.Tile;
 
 /**
  * Implements NES 2.0 ROM file format. Delegates read/write CPU and PPU operations to the mapper.
@@ -26,6 +27,11 @@ public class NES20 implements Content {
     @Override
     public void write(int addr, byte value) {
         this.mapper.write(addr, value);
+    }
+
+    @Override
+    public Tile getTile(final int bank, final int num) {
+        return this.mapper.getTile(bank, num);
     }
 
     /**

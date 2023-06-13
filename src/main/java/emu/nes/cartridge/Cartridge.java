@@ -1,5 +1,6 @@
 package emu.nes.cartridge;
 
+import emu.nes.graphics.Tile;
 import emu.nes.memory.Memory;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +28,10 @@ public class Cartridge implements Memory {
     @Override
     public void write(int addr, byte value) {
         this.content.write(addr + 0x4020, value);
+    }
+
+    public Tile getTile(final int bank, final int num) {
+        return this.content.getTile(bank, num);
     }
 
 }
