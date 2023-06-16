@@ -6,8 +6,15 @@ package emu.nes.memory;
  */
 public class ByteMemory implements Memory {
 
+    /**
+     * Memory data.
+     */
     private final byte[] data;
 
+    /**
+     * Builds a byte memory with the given size in bytes.
+     * @param size Data size
+     */
     public ByteMemory(final int size) {
         this.data = new byte[size];
     }

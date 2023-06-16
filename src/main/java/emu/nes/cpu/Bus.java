@@ -1,5 +1,6 @@
 package emu.nes.cpu;
 
+import emu.nes.DMA;
 import emu.nes.Test;
 import emu.nes.cartridge.Cartridge;
 import emu.nes.graphics.PPU;
@@ -12,32 +13,58 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * CPU Bus logic.
+ * CPU Bus logic. Acts like a selector byte memory to address RAM, PPU and APU.
+ * Overrides the write method to handle the special case for DMA.
  * @author hdouss
  *
  */
 public class Bus extends SelectorByteMemory {
 
-    public Bus(PPU ppu) {
+    /**
+     * DMA address.
+     */
+    private static final int DMA_ADDRESS = 0x4014;
+
+    /**
+     * DMA.
+     */
+    private DMA dma;
+
+    /**
+     * Builds a cpu bus with the passed PPU and DMA.
+     * @param ppu Connected PPU.
+     * @param dma Connected DMA.
+     */
+    public Bus(final PPU ppu, final DMA dma) {
         super(Bus.memoryMap(ppu));
+        this.dma = dma;
     }
 
     /**
      * Connects the bus to the cartridge, or to void.
      * @param cartridge Cartridge or void to connect
      */
-    public void insert(Optional<Cartridge> cartridge) {
+    public void insert(final Optional<Cartridge> cartridge) {
         this.memories().remove(0x4020);
         if (cartridge.isPresent()) {
             this.memories().put(0x4020, cartridge.get());
         }
     }
 
+    @Override
+    public void write(int addr, byte value) {
+        if (addr == Bus.DMA_ADDRESS) {
+            this.dma.write(value, this);
+        }
+        super.write(addr, value);
+    }
+
     /**
      * Builds the memory map for the CPU.
+     * @param ppu Connected PPU.
      * @return A memory map for the CPU
      */
-    private static Map<Integer, Memory> memoryMap(PPU ppu) {
+    private static Map<Integer, Memory> memoryMap(final PPU ppu) {
         Map<Integer, Memory> result = new HashMap<>();
         result.put(0x0000, new MirroredByteMemory(0x800, 0x800));
         result.put(0x2000, ppu);

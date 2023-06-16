@@ -43,7 +43,7 @@ public class NES {
         this.running = false;
         this.ppubus = new PPUBus();
         final PPU ppu = new PPU(this.ppubus);
-        this.bus = new Bus(ppu);
+        this.bus = new Bus(ppu, new DMA(ppu));
         this.cpu = new Cpu(this.bus);
         this.clock = new Clock(this.cpu, ppu);
         this.cartridge = Optional.empty();
