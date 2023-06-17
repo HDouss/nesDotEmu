@@ -24,6 +24,10 @@ public class PPU implements Memory {
      */
     private OAM oam;
 
+    /**
+     * Builds a PPU with the passed PPU bus.
+     * @param bus PPU bus
+     */
     public PPU(final PPUBus bus) {
         this.bus = bus;
         this.oam = new OAM();
@@ -66,9 +70,12 @@ public class PPU implements Memory {
         return super.toString() + this.bus.toString() + this.oam.toString();
     }
 
-    public void writeOAM(final byte read) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * Writes a byte to the OAM according to the OAM address.
+     * @param data Data to write
+     */
+    public void writeOAM(final byte data) {
+        this.oam.write(this.registers.getOamAddress(), data);
     }
 
     
