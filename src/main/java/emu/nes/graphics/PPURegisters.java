@@ -25,7 +25,22 @@ public class PPURegisters extends ByteMemory {
     private static final int PPUSTATUS = 0x2002;
 
     /**
-     * Memory Address latch.
+     * OAMADDR register address.
+     */
+    private static final int OAMADDR = 0x2003;
+
+    /**
+     * OAMDATA register address.
+     */
+    private static final int OAMDATA = 0x2004;
+
+    /**
+     * PPUSCROLL register address.
+     */
+    private static final int PPUSCROLL = 0x2005;
+
+    /**
+     * Double writing latch.
      */
     private boolean latch = false;
 
@@ -33,6 +48,16 @@ public class PPURegisters extends ByteMemory {
      * Memory Address combined.
      */
     private int address = 0x0000;
+
+    /**
+     * Scroll horizontal value.
+     */
+    private int scrollx = 0;
+
+    /**
+     * Scroll vertical value.
+     */
+    private int scrolly = 0;
 
     public PPURegisters() {
         super(8);
@@ -52,7 +77,7 @@ public class PPURegisters extends ByteMemory {
     }
 
     /**
-     * Writing logic for handling special cases when writing to the PPUADDR or to the PPUDATA.
+     * Writing logic for handling special cases when writing to the PPUADDR, PPUDATA or OAMDATA.
      * @param addr Address to write to.
      * @param value Value to write.
      * @param bus PPU bus used to read/write data from VRAM.
@@ -71,6 +96,17 @@ public class PPURegisters extends ByteMemory {
         if (addr == PPURegisters.PPUDATA) {
             bus.write(this.address, value);
             this.incrementAddress();
+        }
+        if (addr == PPURegisters.OAMDATA) {
+            super.write(PPURegisters.OAMADDR, (byte) (super.read(PPURegisters.OAMADDR) + 1));
+        }
+        if (addr == PPURegisters.PPUSCROLL) {
+            if (this.latch) {
+                this.scrollx = value;
+            } else {
+                this.scrolly = value;
+            }
+            this.latch = !this.latch;
         }
     }
 
@@ -136,6 +172,22 @@ public class PPURegisters extends ByteMemory {
      */
     public byte getData() {
         return this.read(7);
+    }
+
+    /**
+     * Gets the stored horizontal scroll value.
+     * @return Horizontal scroll value.
+     */
+    public int getHorizontalScroll() {
+        return this.scrollx;
+    }
+
+    /**
+     * Gets the stored vertical scroll value.
+     * @return Vertical scroll value.
+     */
+    public int getVerticalScroll() {
+        return this.scrolly;
     }
 
     /**
