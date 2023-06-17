@@ -2,7 +2,7 @@ package emu.nes.memory;
 
 /**
  * Byte array backed memory defined by its size. A read/write always succeeds, because addresses
- * are modulo the size.
+ * are modulo the size. So it supports mirroring out of the box.
  */
 public class ByteMemory implements Memory {
 

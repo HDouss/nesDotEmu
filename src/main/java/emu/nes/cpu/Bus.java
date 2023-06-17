@@ -4,8 +4,8 @@ import emu.nes.DMA;
 import emu.nes.Test;
 import emu.nes.cartridge.Cartridge;
 import emu.nes.graphics.PPU;
+import emu.nes.memory.ByteMemory;
 import emu.nes.memory.Memory;
-import emu.nes.memory.MirroredByteMemory;
 import emu.nes.memory.SelectorByteMemory;
 import emu.nes.sound.APU;
 import java.util.HashMap;
@@ -66,7 +66,7 @@ public class Bus extends SelectorByteMemory {
      */
     private static Map<Integer, Memory> memoryMap(final PPU ppu) {
         Map<Integer, Memory> result = new HashMap<>();
-        result.put(0x0000, new MirroredByteMemory(0x800, 0x800));
+        result.put(0x0000, new ByteMemory(0x800));
         result.put(0x2000, ppu);
         result.put(0x4000, new APU());
         result.put(0x4018, new Test());

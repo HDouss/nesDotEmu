@@ -1,8 +1,8 @@
 package emu.nes.graphics;
 
 import emu.nes.cartridge.Cartridge;
+import emu.nes.memory.ByteMemory;
 import emu.nes.memory.Memory;
-import emu.nes.memory.MirroredByteMemory;
 import emu.nes.memory.SelectorByteMemory;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +47,8 @@ public class PPUBus extends SelectorByteMemory {
      */
     private static Map<Integer, Memory> memoryMap() {
         Map<Integer, Memory> result = new HashMap<>();
-        result.put(0x2000, new MirroredByteMemory(0x1000, 0x1000));
-        result.put(0x3F00, new MirroredByteMemory(0x0020, 0x0020));
+        result.put(0x2000, new ByteMemory(0x1000));
+        result.put(0x3F00, new ByteMemory(0x0020));
         return result;
     }
 

@@ -1,13 +1,13 @@
 package emu.nes.graphics;
 
-import emu.nes.memory.MirroredByteMemory;
+import emu.nes.memory.ByteMemory;
 
 
 /**
  * PPU registers. Handles all logic related to reading and writing from registers, including
  * double read/writes for PPUADDR and PPUSCROLL.
  */
-public class PPURegisters extends MirroredByteMemory {
+public class PPURegisters extends ByteMemory {
 
     /**
      * PPUADDR register address.
@@ -35,7 +35,7 @@ public class PPURegisters extends MirroredByteMemory {
     private int address = 0x0000;
 
     public PPURegisters() {
-        super(8, 8);
+        super(8);
     }
 
     @Override
