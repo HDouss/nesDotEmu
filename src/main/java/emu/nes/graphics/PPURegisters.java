@@ -114,20 +114,20 @@ public class PPURegisters extends ByteMemory {
      * Reports PPUCTRL data.
      * @return PPUCTRL data
      */
-    public byte getControl() {
-        return this.read(0);
+    public Control getControl() {
+        return new Control(this.read(0));
     }
 
     /**
      * Reports PPUMASK data.
      * @return PPUMASK data
      */
-    public byte getMask() {
-        return this.read(1);
+    public Mask getMask() {
+        return new Mask(this.read(1));
     }
 
     /**
-     * Reports PPUSTATUS data.
+     * Reports PPUSTATUS data. Probably unused.
      * @return PPUSTATUS data
      */
     public byte getStatus() {
@@ -151,7 +151,7 @@ public class PPURegisters extends ByteMemory {
     }
 
     /**
-     * Reports PPUSCROLL data.
+     * Reports PPUSCROLL data. Probably unused.
      * @return PPUSCROLL data
      */
     public byte getScroll() {
@@ -194,7 +194,7 @@ public class PPURegisters extends ByteMemory {
      * Increments PPUADDRESS register by the amount specified in PPUCTRL register.
      */
     private void incrementAddress() {
-        int increment = (this.getControl() & 0x100) > 0 ? 32 : 1;
+        int increment = this.getControl().addressIncrement();
         this.address = this.address + increment;
         super.write(PPURegisters.PPUADDR, (byte) ((this.address & 0xFF) + increment));
     }
