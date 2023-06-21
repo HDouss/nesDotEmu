@@ -34,4 +34,12 @@ public class Cartridge implements Memory {
         return this.content.getTile(bank, num);
     }
 
+    /**
+     * Returns the nametable memory (CIRAM or in cartridge) with appropriate mirroring.
+     * @return Nametable memory kind
+     */
+    public Memory nametable() {
+        return this.content.nametable();
+    }
+
 }

@@ -3,7 +3,10 @@ package emu.nes.cartridge;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import emu.nes.graphics.HorizontalCIRAM;
 import emu.nes.graphics.Tile;
+import emu.nes.graphics.VerticalCIRAM;
+import emu.nes.memory.Memory;
 
 /**
  * Abstract mapper with a simple implementation for the cartridge informations setters. 
@@ -43,9 +46,9 @@ public abstract class AbstractMapper implements Mapper {
     protected byte[] misc;
 
     /**
-     * Four screen mode.
+     * Nametable mirroring mode.
      */
-    protected boolean fourscreen;
+    protected int mirroring;
 
     /**
      * Ram size.
@@ -109,10 +112,10 @@ public abstract class AbstractMapper implements Mapper {
     }
 
     /**
-     * Setter for Four screen mode.
+     * Setter for nametable mirroring mode.
      */
-    public void setFourScreenMode(final boolean mode) {
-        this.fourscreen = mode;
+    public void setNametableMirroring(final int mode) {
+        this.mirroring = mode;
     }
 
     /**
@@ -141,6 +144,18 @@ public abstract class AbstractMapper implements Mapper {
      */
     public void setNVCHRAMSize(final int size) {
         this.nvChRamSize = size;
+    }
+
+    @Override
+    public Memory nametable() {
+        Memory result = this;
+        if (this.mirroring == Mapper.HORIZONTAL) {
+            result = new HorizontalCIRAM();
+        }
+        if (this.mirroring == Mapper.VERTICAL) {
+            result = new VerticalCIRAM();
+        }
+        return result;
     }
 
     /**

@@ -26,6 +26,11 @@ public class Bus extends SelectorByteMemory {
     private static final int DMA_ADDRESS = 0x4014;
 
     /**
+     * Cartridge starting addressing range.
+     */
+    private static final int CARTRIDGE_START_ADDRESS = 0x4020;
+
+    /**
      * DMA.
      */
     private DMA dma;
@@ -45,9 +50,9 @@ public class Bus extends SelectorByteMemory {
      * @param cartridge Cartridge or void to connect
      */
     public void insert(final Optional<Cartridge> cartridge) {
-        this.memories().remove(0x4020);
+        this.memories().remove(Bus.CARTRIDGE_START_ADDRESS);
         if (cartridge.isPresent()) {
-            this.memories().put(0x4020, cartridge.get());
+            this.memories().put(Bus.CARTRIDGE_START_ADDRESS, cartridge.get());
         }
     }
 

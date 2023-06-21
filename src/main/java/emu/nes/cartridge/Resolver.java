@@ -1,6 +1,7 @@
 package emu.nes.cartridge;
 
 import emu.nes.graphics.Tile;
+import emu.nes.memory.Memory;
 
 /**
  * A content implementation that figures out the file format and delegates operations to the file
@@ -39,6 +40,11 @@ public class Resolver implements Content {
     @Override
     public Tile getTile(final int bank, final int num) {
         return this.rom.getTile(bank, num);
+    }
+
+    @Override
+    public Memory nametable() {
+        return this.rom.nametable();
     }
 
 }

@@ -15,8 +15,24 @@ import java.util.Optional;
  */
 public class PPUBus extends SelectorByteMemory {
 
+    /**
+     * Nametable starting addressing range.
+     */
+    private static final int NAMETABLE_START_ADDRESS = 0x2000;
+
+    /**
+     * Cartridge starting addressing range.
+     */
+    private static final int CARTRIDGE_START_ADDRESS = 0x0000;
+
+    /**
+     * An optionally inserted cartridge.
+     */
     private Optional<Cartridge> cartridge;
 
+    /**
+     * Builds a PPU Bus with adressable memories.
+     */
     public PPUBus() {
         super(PPUBus.memoryMap());
     }
@@ -26,10 +42,12 @@ public class PPUBus extends SelectorByteMemory {
      * @param cartridge Cartridge or void to connect
      */
     public void insert(Optional<Cartridge> cartridge) {
-        this.memories().remove(0x0000);
+        this.memories().remove(PPUBus.CARTRIDGE_START_ADDRESS);
+        this.memories().remove(PPUBus.NAMETABLE_START_ADDRESS);
         this.cartridge = cartridge;
         if (cartridge.isPresent()) {
-            this.memories().put(0x0000, cartridge.get());
+            this.memories().put(PPUBus.CARTRIDGE_START_ADDRESS, cartridge.get());
+            this.memories().put(PPUBus.NAMETABLE_START_ADDRESS, cartridge.get().nametable());
         }
     }
 
@@ -47,7 +65,6 @@ public class PPUBus extends SelectorByteMemory {
      */
     private static Map<Integer, Memory> memoryMap() {
         Map<Integer, Memory> result = new HashMap<>();
-        result.put(0x2000, new ByteMemory(0x1000));
         result.put(0x3F00, new ByteMemory(0x0020));
         return result;
     }

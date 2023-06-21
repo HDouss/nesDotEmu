@@ -2,6 +2,7 @@ package emu.nes.cartridge;
 
 import java.util.Arrays;
 import emu.nes.graphics.Tile;
+import emu.nes.memory.Memory;
 
 /**
  * Implements NES 2.0 ROM file format. Delegates read/write CPU and PPU operations to the mapper.
@@ -34,6 +35,11 @@ public class NES20 implements Content {
         return this.mapper.getTile(bank, num);
     }
 
+    @Override
+    public Memory nametable() {
+        return this.mapper.nametable();
+    }
+
     /**
      * Figures out and builds the cartridge mapper. 
      * @param content ROM file content
@@ -59,7 +65,9 @@ public class NES20 implements Content {
         result.setAdditionalRom(
             Arrays.copyOfRange(content, 16 + trainer + prgSize + chrSize, content.length)
         );
-        result.setFourScreenMode((content[6] & 0x08) > 0);
+        result.setNametableMirroring(
+            (content[6] & 0x08) > 0 ? Mapper.FOUR_SCREEN : content[6] & 0x01
+        );
         int prgram = content[10] & 0x0F;
         int prgnvram = (content[10] & 0xF0) >> 4;
         int chrram = content[11] & 0x0F;

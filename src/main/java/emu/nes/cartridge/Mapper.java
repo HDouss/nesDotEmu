@@ -10,6 +10,21 @@ package emu.nes.cartridge;
 public interface Mapper extends Content {
 
     /**
+     * Horizontal mirroring mode constant. 
+     */
+    int HORIZONTAL = 0;
+
+    /**
+     * Vertical mirroring mode constant. 
+     */
+    int VERTICAL = 1;
+
+    /**
+     * Four screen mirroring mode constant. 
+     */
+    int FOUR_SCREEN = 2;
+
+    /**
      * Sets trainer data.
      * @param trainer Trainer data.
      */
@@ -34,10 +49,10 @@ public interface Mapper extends Content {
     public void setAdditionalRom(final byte[] misc);
 
     /**
-     * Sets whether four screen mode is enabled
-     * @param mode Whether four screen mode is enabled
+     * Sets nametable mirroring mode as read in the cartridge. Could be overridden by the mapper.
+     * @param mode Nametable mirroring mode (see HORIZONTAL, VERTICAL and FOUR_SCREEN constants)
      */
-    public void setFourScreenMode(final boolean mode);
+    public void setNametableMirroring(final int mode);
 
     /**
      * Sets cartridge ram size
