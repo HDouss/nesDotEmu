@@ -26,17 +26,13 @@ package emu.nes.nestest;
 import emu.nes.GUI;
 import emu.nes.NES;
 import emu.nes.cartridge.Cartridge;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,26 +41,6 @@ import org.junit.Test;
  * @since 0.1
  */
 public final class NesTestCPU {
-
-    /**
-     * Output content.
-     */
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-
-    /**
-     * Error content.
-     */
-    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
-
-    /**
-     * Original system out.
-     */
-    private final PrintStream originalOut = System.out;
-
-    /**
-     * Original system err.
-     */
-    private final PrintStream originalErr = System.err;
 
     /**
      * Daemon thread.
@@ -88,7 +64,7 @@ public final class NesTestCPU {
         int read = 0;
         while (valid && read < expected.size()) {
             Thread.sleep(500);
-            String check = outContent.toString();
+            String check = nes.cpu().getOutput().toString();
             String[] lines = check.split(System.getProperty("line.separator"));
             int total = lines.length - 1;
             total = total > expected.size() ? expected.size() : total;
@@ -98,18 +74,6 @@ public final class NesTestCPU {
             read = total;
         }
         nes.toggleOn(null);
-    }
-
-    @Before
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
-        System.setErr(new PrintStream(errContent));
-    }
-
-    @After
-    public void restoreStreams() {
-        System.setOut(originalOut);
-        System.setErr(originalErr);
     }
 
     @BeforeClass

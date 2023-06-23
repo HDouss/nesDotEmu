@@ -29,7 +29,12 @@ public class Cpu {
     /**
      * Total cycles count.
      */
-    int cycleCount = 7;
+    private int cycleCount = 7;
+
+    /**
+     * Output CPU state essentially for testing purposes.
+     */
+    private StringBuilder output = new StringBuilder();
 
     public Cpu(Bus bus) {
         this.bus = bus;
@@ -44,7 +49,7 @@ public class Cpu {
      */
     public void tick() {
         if (this.remaining == 0) {
-            System.out.println(String.format("%s CYC:%s", this, this.cycleCount));
+            this.output.append(String.format("%s CYC:%s%s", this, this.cycleCount, System.getProperty("line.separator")));
             final int pc = this.registers.getPc();
             this.registers.setPc(pc + 1);
             byte inst = this.bus.read(pc);
@@ -73,6 +78,14 @@ public class Cpu {
     public void off() {
         this.cycleCount = 7;
         this.registers.reset();
+    }
+
+    /**
+     * Accessor for the cpu output.
+     * @return CPU Output
+     */
+    public StringBuilder getOutput() {
+        return this.output;
     }
 
     @Override

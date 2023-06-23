@@ -35,6 +35,11 @@ public class NES {
     private Cpu cpu;
 
     /**
+     * NES PPU.
+     */
+    private PPU ppu;
+
+    /**
      * PPU Bus.
      */
     private PPUBus ppubus;
@@ -42,10 +47,10 @@ public class NES {
     public NES() throws InterruptedException {
         this.running = false;
         this.ppubus = new PPUBus();
-        final PPU ppu = new PPU(this.ppubus);
-        this.bus = new Bus(ppu, new DMA(ppu));
+        this.ppu = new PPU(this.ppubus);
+        this.bus = new Bus(this.ppu, new DMA(this.ppu));
         this.cpu = new Cpu(this.bus);
-        this.clock = new Clock(this.cpu, ppu);
+        this.clock = new Clock(this.cpu, this.ppu);
         this.cartridge = Optional.empty();
     }
 
@@ -81,5 +86,21 @@ public class NES {
             this.toggleOn(gui);
             this.toggleOn(gui);
         }
+    }
+
+    /**
+     * Accessor for the NES CPU.
+     * @return Nes CPU
+     */
+    public Cpu cpu() {
+        return this.cpu;
+    }
+
+    /**
+     * Accessor for the NES PPU.
+     * @return Nes PPU
+     */
+    public PPU ppu() {
+        return this.ppu;
     }
 }

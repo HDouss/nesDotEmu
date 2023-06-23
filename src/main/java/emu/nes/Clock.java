@@ -42,8 +42,9 @@ public class Clock {
      */
     private Thread thread;
 
-    private GUI gui;
-
+    /**
+     * Picture instance to draw the frame. 
+     */
     private Picture picture;
 
     public Clock(final Cpu cpu, final PPU ppu) throws InterruptedException {

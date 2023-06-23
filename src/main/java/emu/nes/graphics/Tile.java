@@ -1,9 +1,5 @@
 package emu.nes.graphics;
 
-import java.io.PrintStream;
-import java.util.Arrays;
-import emu.nes.cartridge.AbstractMapper;
-
 public class Tile {
     
     /**
@@ -21,11 +17,6 @@ public class Tile {
 
     public Tile(byte[] content) {
         this.data = Tile.getPixelBytes(content);
-        /*for (int i = 0; i< 8;i++) {
-            System.out.println(Arrays.toString(Arrays.copyOfRange(content, 8*i, 8*i+8)));
-        }
-        System.out.println();
-        System.out.println();*/
     }
 
     public byte getPixel(final int xcor, final int ycor) {
