@@ -2,6 +2,7 @@ package emu.nes;
 
 import emu.nes.cpu.Cpu;
 import emu.nes.graphics.PPU;
+import emu.nes.graphics.Picture;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -41,6 +42,10 @@ public class Clock {
      */
     private Thread thread;
 
+    private GUI gui;
+
+    private Picture picture;
+
     public Clock(final Cpu cpu, final PPU ppu) throws InterruptedException {
         this.cpu = cpu;
         this.ppu = ppu;
@@ -54,7 +59,9 @@ public class Clock {
                     long duration = now - last;
                     if (duration > Clock.PERIOD) {
                         last = now;
-                        Clock.this.ppu.tick();
+                        if (Clock.this.ppu.tick()) {
+                            Clock.this.picture.draw(Clock.this.ppu);
+                        }
                         if (ticks % 3 == 0) {
                             Clock.this.cpu.tick();
                         }
@@ -70,9 +77,11 @@ public class Clock {
 
     /**
      * Starts ticking the clock.
+     * @param gui 
      */
-    public void start() {
+    public void start(GUI gui) {
         if (!this.running) {
+            this.picture = new Picture(gui);
             this.running = true;
             this.thread = new Thread(this.runnable);
             this.thread.setPriority(Thread.MAX_PRIORITY);

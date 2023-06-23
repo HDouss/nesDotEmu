@@ -51,14 +51,15 @@ public class NES {
 
     /**
      * Switch the NES on or off.
+     * @param gui 
      */
-    public void toggleOn() {
+    public void toggleOn(final GUI gui) {
         this.running = !this.running;
         if (this.running) {
             this.bus.insert(this.cartridge);
             this.ppubus.insert(this.cartridge);
             this.cpu.on();
-            this.clock.start();
+            this.clock.start(gui);
         } else {
             this.clock.stop();
             this.cpu.off();
@@ -75,10 +76,10 @@ public class NES {
         this.ppubus.insert(this.cartridge);
     }
 
-    public void reset() {
+    public void reset(final GUI gui) {
         if (this.running) {
-            this.toggleOn();
-            this.toggleOn();
+            this.toggleOn(gui);
+            this.toggleOn(gui);
         }
     }
 }

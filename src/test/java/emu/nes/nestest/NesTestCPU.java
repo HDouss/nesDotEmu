@@ -23,6 +23,7 @@
  */
 package emu.nes.nestest;
 
+import emu.nes.GUI;
 import emu.nes.NES;
 import emu.nes.cartridge.Cartridge;
 import java.io.ByteArrayOutputStream;
@@ -82,7 +83,7 @@ public final class NesTestCPU {
         List<String> expected = Files.readAllLines(
             Paths.get(ClassLoader.getSystemResource("classic/expected-nesdotemu.log").toURI())
         );
-        nes.toggleOn();
+        nes.toggleOn(new GUI());
         boolean valid = true;
         int read = 0;
         while (valid && read < expected.size()) {
@@ -96,7 +97,7 @@ public final class NesTestCPU {
             }
             read = total;
         }
-        nes.toggleOn();
+        nes.toggleOn(null);
     }
 
     @Before

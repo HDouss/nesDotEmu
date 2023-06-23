@@ -1,9 +1,12 @@
 package emu.nes;
 
 import emu.nes.cartridge.Cartridge;
+import emu.nes.graphics.Picture;
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -25,14 +28,15 @@ public class GUI extends JFrame {
      */
     private static final long serialVersionUID = -4646410431880625186L;
     private static final int BORDER_INSET = 5;
+    private BufferedImage frame;
 
     public GUI() throws InterruptedException {
         final NES nes = new NES();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         final int posx = 100;
         final int posy = 100;
-        final int width = 450;
-        final int height = 300;
+        final int width = Picture.SCREEN_WIDTH + 250;
+        final int height = Picture.SCREEN_HEIGHT + 250;
         this.setBounds(posx, posy, width, height);
         final JPanel content = new JPanel();
         content.setBorder(
@@ -56,12 +60,12 @@ public class GUI extends JFrame {
         buttons.add(eject);
         onoff.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                nes.toggleOn();
+                nes.toggleOn(GUI.this);
             }
         });
         reset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                nes.reset();
+                nes.reset(GUI.this);
             }
         });
         insert.addActionListener(new ActionListener() {
@@ -89,5 +93,15 @@ public class GUI extends JFrame {
             }
         });
         content.add(buttons, BorderLayout.EAST);
+    }
+
+    @Override
+    public void paint(final Graphics graphics) {
+        super.paint(graphics);
+        graphics.drawImage(this.frame, 0, 0, null);
+    }
+
+    public void setFrame(BufferedImage frame) {
+        this.frame = frame;
     }
 }

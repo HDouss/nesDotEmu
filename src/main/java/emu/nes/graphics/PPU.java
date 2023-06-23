@@ -1,5 +1,6 @@
 package emu.nes.graphics;
 
+import java.util.Random;
 import emu.nes.memory.Memory;
 
 /**
@@ -25,11 +26,27 @@ public class PPU implements Memory {
     private OAM oam;
 
     /**
+     * Current cycle.
+     */
+    private int cycles = 0;
+
+    /**
+     * Current scanline.
+     */
+    private int scanline = 0;
+
+    /**
+     * Frame being currently drawn.
+     */
+    private Frame frame;
+
+    /**
      * Builds a PPU with the passed PPU bus.
      * @param bus PPU bus
      */
     public PPU(final PPUBus bus) {
         this.bus = bus;
+        this.frame = new Frame();
         this.oam = new OAM();
         this.registers = new PPURegisters();
     }
@@ -44,7 +61,8 @@ public class PPU implements Memory {
         this.registers.write(addr, value, this.bus);
     }
 
-    public void tick() {
+    public boolean tick() {
+        boolean result = false;
         // Modify PPUStatus: Sprite 0 Hit.
         //   Set when a nonzero pixel of sprite 0 overlaps a nonzero background pixel;
         //   cleared at dot 1 of the pre-render line.  Used for raster timing.
@@ -89,6 +107,19 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
          * the sprite data that occurs first will overlap any other sprites after it.
          * For example, when sprites at OAM $0C and $28 overlap, the sprite at $0C will appear in front.
          */
+        this.cycles ++;
+        if (this.cycles >= 341) {
+            this.cycles = 0;
+            this.scanline ++;
+            if (this.scanline >= 261) {
+                this.scanline = -1;
+                result = true;
+            }
+        }
+        if(this.cycles < Picture.NES_WIDTH && this.scanline < Picture.NES_HEIGHT - 1) {
+            this.frame.setColor(this.cycles, this.scanline + 1, new Random().nextInt(64));
+        }
+        return result;
     }
 
     @Override
@@ -103,6 +134,10 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
      */
     public void writeOAM(final byte data) {
         this.oam.write(this.registers.getOamAddress(), data);
+    }
+
+    public Frame getFrame() {
+        return this.frame;
     }
 
     
