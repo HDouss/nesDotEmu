@@ -2,6 +2,9 @@ package emu.nes.cpu;
 
 import emu.nes.addressing.AddressingResult;
 import emu.nes.addressing.Addressings;
+import emu.nes.ops.IRQ;
+import emu.nes.ops.NMI;
+import emu.nes.ops.Operation;
 import emu.nes.ops.Operations;
 
 /**
@@ -35,6 +38,16 @@ public class Cpu {
      * Output CPU state essentially for testing purposes.
      */
     private StringBuilder output = new StringBuilder();
+
+    /**
+     * IRQ operation.
+     */
+    private Operation irq = new IRQ();
+
+    /**
+     * NMI operation.
+     */
+    private Operation nmi = new NMI();
 
     public Cpu(Bus bus) {
         this.bus = bus;
@@ -78,6 +91,20 @@ public class Cpu {
     public void off() {
         this.cycleCount = 7;
         this.registers.reset();
+    }
+
+    /**
+     * Fires an NMI interrupt.
+     */
+    public void nmi() {
+        this.remaining = this.nmi.execute(this.registers, this.bus, new AddressingResult());
+    }
+
+    /**
+     * Fires an IRQ interrupt.
+     */
+    public void irq() {
+        this.remaining = this.irq.execute(this.registers, this.bus, new AddressingResult());
     }
 
     /**
