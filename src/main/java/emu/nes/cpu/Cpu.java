@@ -69,7 +69,7 @@ public class Cpu {
         int msb = this.bus.read(0xFFFD);
         this.registers.setPc((lsb & 0xFF) | (msb << 8));
         // for nestest
-        this.registers.setPc(0xC000);
+        //this.registers.setPc(0xC000);
     }
 
     /**

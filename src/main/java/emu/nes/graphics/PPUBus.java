@@ -1,7 +1,6 @@
 package emu.nes.graphics;
 
 import emu.nes.cartridge.Cartridge;
-import emu.nes.memory.ByteMemory;
 import emu.nes.memory.Memory;
 import emu.nes.memory.SelectorByteMemory;
 import java.util.HashMap;
@@ -51,7 +50,6 @@ public class PPUBus extends SelectorByteMemory {
         }
     }
 
-    
     public Tile getTile(final int bank, final int num) {
         if (this.cartridge.isPresent()) {
             return this.cartridge.get().getTile(bank, num);
@@ -65,7 +63,7 @@ public class PPUBus extends SelectorByteMemory {
      */
     private static Map<Integer, Memory> memoryMap() {
         Map<Integer, Memory> result = new HashMap<>();
-        result.put(0x3F00, new ByteMemory(0x0020));
+        result.put(0x3F00, new Palette());
         return result;
     }
 

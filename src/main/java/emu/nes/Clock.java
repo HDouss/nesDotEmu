@@ -3,7 +3,6 @@ package emu.nes;
 import emu.nes.cpu.Cpu;
 import emu.nes.graphics.PPU;
 import emu.nes.graphics.Picture;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * Clocking logic for CPU, PPU and APU.
@@ -50,7 +49,7 @@ public class Clock {
     public Clock(final Cpu cpu, final PPU ppu) throws InterruptedException {
         this.cpu = cpu;
         this.ppu = ppu;
-        final int waitTime = Clock.PERIOD / 2;
+        //final int waitTime = Clock.PERIOD / 2;
         this.runnable = new Runnable() {
             public void run() {
                 int ticks = 0;
@@ -62,13 +61,14 @@ public class Clock {
                         last = now;
                         if (Clock.this.ppu.tick()) {
                             Clock.this.picture.draw(Clock.this.ppu);
+                            System.out.println(Clock.this.cpu.getOutput());
                         }
                         if (ticks % 3 == 0) {
                             Clock.this.cpu.tick();
                         }
                         ticks++;
                     } else {
-                        LockSupport.parkNanos(waitTime);
+                        //LockSupport.parkNanos(waitTime);
                     }
                 }
             }

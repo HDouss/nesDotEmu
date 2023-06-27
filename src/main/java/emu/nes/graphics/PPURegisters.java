@@ -17,27 +17,27 @@ public class PPURegisters extends ByteMemory {
     /**
      * PPUDATA register address.
      */
-    private static final int PPUDATA = 0x2007;
+    private static final int PPUDATA = 7;
 
     /**
      * PPUSTATUS register address.
      */
-    private static final int PPUSTATUS = 0x2002;
+    private static final int PPUSTATUS = 2;
 
     /**
      * OAMADDR register address.
      */
-    private static final int OAMADDR = 0x2003;
+    private static final int OAMADDR = 3;
 
     /**
      * OAMDATA register address.
      */
-    private static final int OAMDATA = 0x2004;
+    private static final int OAMDATA = 4;
 
     /**
      * PPUSCROLL register address.
      */
-    private static final int PPUSCROLL = 0x2005;
+    private static final int PPUSCROLL = 5;
 
     /**
      * Double writing latch.
@@ -190,6 +190,13 @@ public class PPURegisters extends ByteMemory {
         return this.scrolly;
     }
 
+    public void reset() {
+        byte reset = 0;
+        for (int index = 0; index < 8; ++index) {
+            this.write(index, reset);
+        }
+    }
+
     /**
      * Increments PPUADDRESS register by the amount specified in PPUCTRL register.
      */
@@ -197,5 +204,13 @@ public class PPURegisters extends ByteMemory {
         int increment = this.getControl().addressIncrement();
         this.address = this.address + increment;
         super.write(PPURegisters.PPUADDR, (byte) ((this.address & 0xFF) + increment));
+    }
+
+    public void setVBlanck() {
+        this.write(2, (byte) (this.getStatus() | 0x80));
+    }
+
+    public void unsetVBlanck() {
+        this.write(2, (byte) (this.getStatus() & 0x7F));
     }
 }

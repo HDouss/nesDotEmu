@@ -68,6 +68,7 @@ public class NES {
         } else {
             this.clock.stop();
             this.cpu.off();
+            this.ppu.off();
         }
     }
 

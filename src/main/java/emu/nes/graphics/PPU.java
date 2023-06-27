@@ -1,6 +1,5 @@
 package emu.nes.graphics;
 
-import java.util.Random;
 import emu.nes.memory.Memory;
 
 /**
@@ -111,15 +110,87 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         if (this.cycles >= 341) {
             this.cycles = 0;
             this.scanline ++;
+            if (this.scanline == 241) {
+                result = true;
+                this.renderBackground();
+                this.renderForeground();
+                this.registers.setVBlanck();
+            }
             if (this.scanline >= 261) {
                 this.scanline = -1;
-                result = true;
+                this.registers.unsetVBlanck();
             }
         }
-        if(this.cycles < Picture.NES_WIDTH && this.scanline < Picture.NES_HEIGHT - 1) {
-            this.frame.setColor(this.cycles, this.scanline + 1, new Random().nextInt(64));
-        }
+        
         return result;
+    }
+
+    private void renderBackground() {
+        int cursor = this.registers.getControl().getNametableAddress();
+        int attrAddr = cursor + 0x03C0;
+        byte attributes = this.bus.read(attrAddr);
+        Byte[] attrs = new Byte[960];
+        this.fillAttrs(attrs, 0, attributes);
+        int tileIndex = 0;
+        while (tileIndex < 960) {
+            int tileNum = this.bus.read(cursor);
+            Tile tile = this.bus.getTile(this.registers.getControl().getBackgroundTableAddress(), tileNum);
+            
+            if (tileIndex % 4 == 0 && attrs[tileIndex] == null) {
+                attrAddr++;
+                attributes = this.bus.read(attrAddr);
+                this.fillAttrs(attrs, tileIndex, attributes);
+            }
+            int startx = (tileIndex % 32) * 8;
+            int starty = (tileIndex / 32) * 8;
+            int color = 4 * attrs[tileIndex];
+            for (int pixelx = 0; pixelx < 8; ++pixelx) {
+                for (int pixely = 0; pixely < 8; ++pixely) {
+                    this.frame.setColor(
+                        startx + pixelx,
+                        starty + pixely,
+                        this.bus.read(0x3F00 + color + tile.getPixel(pixelx, pixely))
+                    );
+                }
+            }
+            cursor++;
+            tileIndex++;
+        }
+    }
+
+    private void renderForeground() {
+        for (int idx = 0; idx < 64; ++idx) {
+            Entry entry = this.oam.entry(idx);
+            Tile tile = this.bus.getTile(
+                this.registers.getControl().getSpriteTableAddress(), entry.spriteTile
+            );
+            int startx = entry.spriteX;
+            int starty = entry.spriteY;
+            int color = 4 * (entry.spriteAttribute & 0x3);
+            for (int pixelx = 0; pixelx < 8; ++pixelx) {
+                for (int pixely = 0; pixely < 8; ++pixely) {
+                    this.frame.setColor(
+                        startx + pixelx,
+                        starty + pixely,
+                        this.bus.read(0x3F04 + color + tile.getPixel(pixelx, pixely))
+                    );
+                }
+            }
+        }
+    }
+
+    private void fillAttrs(Byte[] attrs, int index, byte attributes) {
+        for(int row = 0; row < 4; ++row) {
+            for(int colum = 0; colum < 4; ++colum) {
+                final int tileIndex = colum + 32 * row;
+                if (tileIndex + index < 960) {
+                attrs[tileIndex + index] = (byte) (
+                    (attributes >> ((tileIndex % 32) / 2 + tileIndex / 64)) & 0x3
+                );
+                }
+            }
+        }
+        
     }
 
     @Override
@@ -140,5 +211,10 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         return this.frame;
     }
 
-    
+    public void off() {
+        this.cycles = 0;
+        this.scanline = 0;
+        this.registers.reset();
+    }
+
 }
