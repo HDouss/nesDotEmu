@@ -19,10 +19,11 @@ public class ShiftRight implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         final Status status = registers.getStatus();
         // shifting converts to int, so consider only 8 bits
-        int data = (res.getData() & 0xFF) >> 1;
+        final byte fetched = res.getData();
+        int data = (fetched & 0xFF) >> 1;
         int addr = res.getAddress();
         updateFlags(registers, data);
-        status.setCarry((res.getData() & 0x1) > 0);
+        status.setCarry((fetched & 0x1) > 0);
         if (addr == 0) {
             registers.setAcc((byte) data);
         } else {

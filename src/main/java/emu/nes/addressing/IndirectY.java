@@ -24,10 +24,9 @@ public class IndirectY implements Addressing {
         int high = (carry + bus.read(nextZeroPage)) & 0xFF;
         registers.setPc(pc + 2);
         final int addr = low | (high << 8);
-        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
-        result.data = data;
+        result.fetch = (address -> bus.read(address));
         result.crossed = ((addr - y) & 0xFF00) != (high << 8);
         return result;
     }

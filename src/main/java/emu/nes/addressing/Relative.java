@@ -15,10 +15,9 @@ public class Relative implements Addressing {
     public AddressingResult address(Bus bus, Registers registers, int pc) {
         registers.setPc(pc + 2);
         final int addr = pc + 1;
-        final byte value = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
-        result.data = value;
+        result.fetch = (address -> bus.read(address));
         return result;
     }
 

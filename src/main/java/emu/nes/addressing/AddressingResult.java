@@ -1,11 +1,8 @@
 package emu.nes.addressing;
 
-public class AddressingResult {
+import java.util.function.Function;
 
-    /**
-     * Fetched data.
-     */
-    protected byte data;
+public class AddressingResult {
 
     /**
      * Address from which the data was fetched.
@@ -18,11 +15,16 @@ public class AddressingResult {
     protected boolean crossed = false;
 
     /**
+     * Function to retrieve the data.
+     */
+    protected Function<Integer, Byte> fetch;
+
+    /**
      * Get the data fetched.
      * @return The data
      */
     public byte getData() {
-        return data;
+        return this.fetch.apply(this.address);
     }
 
     /**

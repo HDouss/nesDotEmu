@@ -14,10 +14,9 @@ public class Immediate implements Addressing {
     public AddressingResult address(Bus bus, Registers registers, int pc) {
         registers.setPc(pc + 2);
         final int addr = pc + 1;
-        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
-        result.data = data;
+        result.fetch = (address -> bus.read(address));
         return result;
     }
 

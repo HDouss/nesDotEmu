@@ -16,7 +16,7 @@ public class Accumulator implements Addressing {
     public AddressingResult address(Bus bus, Registers registers, int pc) {
         AddressingResult result = new AddressingResult();
         result.address = 0;
-        result.data = registers.getAcc();
+        result.fetch = (address -> registers.getAcc());
         return result;
     }
 }

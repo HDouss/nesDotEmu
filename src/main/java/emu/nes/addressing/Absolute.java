@@ -17,10 +17,9 @@ public class Absolute implements Addressing {
         registers.setPc(pc + 3);
         // data implicitly converted to integers, consider only 8 bits
         final int addr = (low & 0xFF) | ((high & 0xFF) << 8);
-        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
-        result.data = data;
+        result.fetch = (address -> bus.read(address));
         return result;
     }
 

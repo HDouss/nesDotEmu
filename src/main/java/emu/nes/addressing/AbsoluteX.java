@@ -19,11 +19,10 @@ public class AbsoluteX implements Addressing {
         registers.setPc(pc + 3);
         // data implicitly converted to integers, consider only 8 bits for addressing
         final int addr = (registers.getX() & 0xFF) + low + (high << 8);
-        // addition result may overflow
-        final byte data = bus.read(addr & 0xFFFF);
         AddressingResult result = new AddressingResult();
-        result.address = addr;
-        result.data = data;
+        // addition result may overflow
+        result.address = addr & 0xFFFF;
+        result.fetch = (address -> bus.read(address));
         result.crossed = (addr & 0xFF00) != (high << 8);
         return result;
     }

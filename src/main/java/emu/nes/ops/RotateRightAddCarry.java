@@ -15,12 +15,13 @@ public class RotateRightAddCarry implements Operation {
     public int execute(Registers registers, Bus bus, AddressingResult res) {
         int carry = registers.getStatus().carry() ? 1 : 0;
         // shifting converts to int, so consider only 8 bits
-        byte data = (byte) (((res.getData() & 0xFF) >> 1) | (carry << 7));
+        final byte fetched = res.getData();
+        byte data = (byte) (((fetched & 0xFF) >> 1) | (carry << 7));
         int addr = res.getAddress();
         if (addr != 0) {
             bus.write(addr, data);
         }
-        carry = res.getData() & 0x1;
+        carry = fetched & 0x1;
         final byte acc = registers.getAcc();
         // integer result consider only 8 bits
         final int result = (acc & 0xFF) + (data & 0xFF) + carry;

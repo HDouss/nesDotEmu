@@ -15,10 +15,9 @@ public class ZeroPage implements Addressing {
         registers.setPc(pc + 2);
         // data interpreted as an address, consider only 8 bits for addressing
         final int addr = bus.read(pc + 1) & 0xFF;
-        final byte data = bus.read(addr);
         AddressingResult result = new AddressingResult();
         result.address = addr;
-        result.data = data;
+        result.fetch = (address -> bus.read(address));
         return result;
     }
 }
