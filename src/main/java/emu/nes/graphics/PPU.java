@@ -60,8 +60,11 @@ public class PPU implements Memory {
         this.registers.write(addr, value, this.bus);
     }
 
+    /**
+     * Called on each clock tick. Return true if a NMI cpu interrupt should occur.
+     * @return Whether a NMI cpu interrupt should occur.
+     */
     public boolean tick() {
-        boolean result = false;
         // Modify PPUStatus: Sprite 0 Hit.
         //   Set when a nonzero pixel of sprite 0 overlaps a nonzero background pixel;
         //   cleared at dot 1 of the pre-render line.  Used for raster timing.
@@ -106,12 +109,14 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
          * the sprite data that occurs first will overlap any other sprites after it.
          * For example, when sprites at OAM $0C and $28 overlap, the sprite at $0C will appear in front.
          */
+        /**
+         * read the sprite size 8 or 16 from control register
+         */
         this.cycles ++;
         if (this.cycles >= 341) {
             this.cycles = 0;
             this.scanline ++;
             if (this.scanline == 241) {
-                result = true;
                 this.renderBackground();
                 this.renderForeground();
                 this.registers.setVBlanck();
@@ -122,7 +127,7 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
             }
         }
         
-        return result;
+        return this.registers.getControl().isNMIAtVblank();
     }
 
     private void renderBackground() {

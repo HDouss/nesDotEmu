@@ -98,7 +98,7 @@ public class GUI extends JFrame {
     @Override
     public void paint(final Graphics graphics) {
         super.paint(graphics);
-        graphics.drawImage(this.frame, 0, 0, null);
+        graphics.drawImage(this.frame, 2, 50, null);
     }
 
     public void setFrame(BufferedImage frame) {

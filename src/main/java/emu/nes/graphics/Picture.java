@@ -42,7 +42,7 @@ public class Picture {
     public void draw(PPU ppu) {
         final Frame frame = ppu.getFrame();
         BufferedImage output = new BufferedImage(
-            Picture.SCREEN_WIDTH, Picture.SCREEN_HEIGHT, BufferedImage.TYPE_INT_ARGB
+            Picture.SCREEN_WIDTH, Picture.SCREEN_HEIGHT, BufferedImage.TYPE_INT_RGB
         );
         for (int xcor = 0; xcor < Picture.SCREEN_WIDTH; ++xcor) {
             for (int ycor = 0; ycor < Picture.SCREEN_HEIGHT; ++ycor) {

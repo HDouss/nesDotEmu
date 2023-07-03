@@ -12,7 +12,7 @@ public class PPURegisters extends ByteMemory {
     /**
      * PPUADDR register address.
      */
-    private static final int PPUADDR = 0x2006;
+    private static final int PPUADDR = 6;
 
     /**
      * PPUDATA register address.
@@ -85,8 +85,8 @@ public class PPURegisters extends ByteMemory {
     public void write(final int addr, final byte value, final PPUBus bus) {
         super.write(addr, value);
         if (addr == PPURegisters.PPUADDR) {
-            if (this.latch) {
-                this.address = value << 8;
+            if (!this.latch) {
+                this.address = (value & 0xFF) << 8;
             } else {
                 this.address = this.address + (value & 0xFF);
                 super.write(PPURegisters.PPUDATA, bus.read(this.address));
@@ -101,7 +101,7 @@ public class PPURegisters extends ByteMemory {
             super.write(PPURegisters.OAMADDR, (byte) (super.read(PPURegisters.OAMADDR) + 1));
         }
         if (addr == PPURegisters.PPUSCROLL) {
-            if (this.latch) {
+            if (!this.latch) {
                 this.scrollx = value;
             } else {
                 this.scrolly = value;
@@ -203,7 +203,7 @@ public class PPURegisters extends ByteMemory {
     private void incrementAddress() {
         int increment = this.getControl().addressIncrement();
         this.address = this.address + increment;
-        super.write(PPURegisters.PPUADDR, (byte) ((this.address & 0xFF) + increment));
+        super.write(PPURegisters.PPUADDR, (byte) (this.address & 0xFF));
     }
 
     public void setVBlanck() {
