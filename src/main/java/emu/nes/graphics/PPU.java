@@ -69,7 +69,7 @@ public class PPU implements Memory {
 
     @Override
     public void write(final int addr, final byte value) {
-        this.registers.write(addr, value, this.bus);
+        this.registers.write(addr, value, this);
     }
 
     /**
@@ -77,48 +77,10 @@ public class PPU implements Memory {
      * @return Whether a NMI cpu interrupt should occur.
      */
     public boolean tick() {
-        // 
-        // PPUStatus: Sprite 0 hit is not detected at x=255, nor is it detected at x=0 through 7 if the background or sprites are hidden in this area.
-        /*
-         * OAMADDR is set to 0 during each of ticks 257–320 (the sprite tile loading interval) of the pre-render and visible scanlines.
-         * If rendering is enabled mid-scanline, there are further consequences of an OAMADDR that was not set to 0 before OAM sprite evaluation begins
-         * at tick 65 of the visible scanline.
-         * The value of OAMADDR at this tick determines the starting address for sprite evaluation for this scanline,
-         * which can cause the sprite at OAMADDR to be treated as it was sprite 0, both for sprite-0 hit and priority.
-         * If OAMADDR is unaligned and does not point to the Y position (first byte) of an OAM entry,
-         * then whatever it points to (tile index, attribute, or X coordinate) will be reinterpreted as a Y position.
-         */
-        /*
-         * Sprite 0 hit does not happen:
-
-If background or sprite rendering is disabled in PPUMASK ($2001)
-At x=0 to x=7 if the left-side clipping window is enabled (if bit 2 or bit 1 of PPUMASK is 0).
-At x=255, for an obscure reason related to the pixel pipeline.
-At any pixel where the background or sprite pixel is transparent
-(2-bit color index from the CHR pattern is %00).
-If sprite 0 hit has already occurred this frame. Bit 6 of PPUSTATUS ($2002)
-is cleared to 0 at dot 1 of the pre-render line.
-This means only the first sprite 0 hit in a frame can be detected.
-Sprite 0 hit happens regardless of the following:
-
-Sprite priority. Sprite 0 can still hit the background from behind.
-The pixel colors. Only the CHR pattern bits are relevant, not the actual rendered colors,
-and any CHR color index except %00 is considered opaque.
-The palette. The contents of the palette are irrelevant to sprite 0 hits.
-For example: a black ($0F) sprite pixel can hit a black ($0F) background
-as long as neither is the transparent color index %00.
-The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Overscan).
-         */
-        /*
-         * Priority between sprites is determined by their address inside OAM.
-         * So to have a sprite displayed in front of another sprite in a scanline,
-         * the sprite data that occurs first will overlap any other sprites after it.
-         * For example, when sprites at OAM $0C and $28 overlap, the sprite at $0C will appear in front.
-         */
-        /**
-         * read the sprite size 8 or 16 from control register
-         */
         this.cycles ++;
+        if (this.cycles >= 257 && this.cycles <= 320 && this.scanline < 240) {
+            this.registers.write(3, (byte) 0);
+        }
         if (this.cycles >= 341) {
             this.cycles = 0;
             this.scanline ++;
@@ -151,7 +113,6 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
                 this.nonzero = new boolean[Picture.NES_WIDTH * Picture.NES_HEIGHT];
             }
         }
-        
         return this.registers.getControl().isNMIAtVblank();
     }
 
@@ -166,6 +127,8 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         Byte[] attrs = new Byte[960];
         this.fillAttrs(attrs, 0, attributes);
         int tileIndex = 0;
+        int hscroll = this.registers.getHorizontalScroll();
+        int vscroll = this.registers.getVerticalScroll();
         while (tileIndex < 960) {
             int tileNum = this.bus.read(cursor);
             Tile tile = this.bus.getTile(
@@ -182,11 +145,12 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
             for (int pixelx = 0; pixelx < 8; ++pixelx) {
                 for (int pixely = 0; pixely < 8; ++pixely) {
                     final byte pixel = tile.getPixel(pixelx, pixely);
-                    final int xcor = startx + pixelx;
-                    final int ycor = starty + pixely;
+                    final int xcor = startx + pixelx - hscroll;
+                    final int ycor = starty + pixely - vscroll;
                     if(xcor > 7 || mask.showLeftBackground()) {
-                        if (pixel > 0) {
-                            this.nonzero[xcor + Picture.NES_WIDTH * ycor] = true;
+                        final int index = xcor + Picture.NES_WIDTH * ycor;
+                        if (pixel > 0 && index > -1 && index < Picture.NES_WIDTH * Picture.NES_HEIGHT) {
+                            this.nonzero[index] = true;
                         }
                         this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F00 + color + pixel));
                     }
@@ -314,6 +278,13 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         this.oam.write(this.registers.getOamAddress(), data);
     }
 
+    /**
+     * Accessor for the PPU bus.
+     * @return PPUBUus
+     */
+    public PPUBus bus() {
+        return this.bus;
+    }
     public Frame getFrame() {
         return this.frame;
     }

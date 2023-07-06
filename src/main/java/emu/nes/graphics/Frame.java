@@ -108,16 +108,39 @@ public class Frame {
             }
         }
     }
+
+    /**
+     * Get the actual RGB color of a pixel.
+     * @param xcor Pixel x coordinate
+     * @param ycor Pixel y coordinate
+     * @return RGB Color
+     */
     public int getColor(final int xcor, final int ycor) {
         return this.pixels[xcor][ycor];
     }
 
+    /**
+     * Sets the NES Palette color of a pixel.
+     * @param xcor Pixel x coordinate
+     * @param ycor Pixel y coordinate
+     * @param color NES Palette Color
+     */
     public void setNESColor(final int xcor, final int ycor, int color) {
-        this.pixels[xcor][ycor] = this.getRgb(color);
+        if (xcor > -1  && xcor < Picture.NES_WIDTH && ycor > -1  && ycor < Picture.NES_HEIGHT) {
+            this.pixels[xcor][ycor] = this.getRgb(color);
+        }
     }
 
+    /**
+     * Sets the actual RGB color of a pixel.
+     * @param xcor Pixel x coordinate
+     * @param ycor Pixel y coordinate
+     * @param color Actual RGB Color
+     */
     public void setColor(final int xcor, final int ycor, int color) {
-        this.pixels[xcor][ycor] = color;
+        if (xcor > -1  && xcor < Picture.NES_WIDTH && ycor > -1  && ycor < Picture.NES_HEIGHT) {
+            this.pixels[xcor][ycor] = color;
+        }
     }
 
     /**

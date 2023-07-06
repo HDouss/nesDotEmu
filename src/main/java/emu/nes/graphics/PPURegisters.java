@@ -83,22 +83,23 @@ public class PPURegisters extends ByteMemory {
      * @param value Value to write.
      * @param bus PPU bus used to read/write data from VRAM.
      */
-    public void write(final int addr, final byte value, final PPUBus bus) {
+    public void write(final int addr, final byte value, final PPU ppu) {
         super.write(addr, value);
         if (addr == PPURegisters.PPUADDR) {
             if (!this.latch) {
                 this.address = (value & 0xFF) << 8;
             } else {
                 this.address = this.address + (value & 0xFF);
-                super.write(PPURegisters.PPUDATA, bus.read(this.address));
+                super.write(PPURegisters.PPUDATA, ppu.bus().read(this.address));
             }
             this.latch = !this.latch;
         }
         if (addr == PPURegisters.PPUDATA) {
-            bus.write(this.address, value);
+            ppu.bus().write(this.address, value);
             this.incrementAddress();
         }
         if (addr == PPURegisters.OAMDATA) {
+            ppu.writeOAM(value);
             super.write(PPURegisters.OAMADDR, (byte) (super.read(PPURegisters.OAMADDR) + 1));
         }
         if (addr == PPURegisters.PPUSCROLL) {
@@ -211,27 +212,27 @@ public class PPURegisters extends ByteMemory {
      * Sets Vblank flag in PPUSTATUS.
      */
     public void setVBlanck() {
-        this.write(2, (byte) (this.getStatus() | 0x80));
+        this.write(2, (byte) (super.read(2) | 0x80));
     }
 
     /**
      * Clears Vblank flag in PPUSTATUS.
      */
     public void unsetVBlanck() {
-        this.write(2, (byte) (this.getStatus() & 0x7F));
+        this.write(2, (byte) (super.read(2) & 0x7F));
     }
 
     /**
      * Sets Sprite 0 Hit flag in PPUSTATUS.
      */
     public void setSpriteZeroHit() {
-        this.write(2, (byte) (this.getStatus() | 0x40));
+        this.write(2, (byte) (super.read(2) | 0x40));
     }
 
     /**
      * Clears Sprite 0 Hit flag in PPUSTATUS.
      */
     public void unsetSpriteZeroHit() {
-        this.write(2, (byte) (this.getStatus() & 0xBF));
+        this.write(2, (byte) (super.read(2) & 0xBF));
     }
 }
