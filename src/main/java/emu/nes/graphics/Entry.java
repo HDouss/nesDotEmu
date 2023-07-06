@@ -42,10 +42,10 @@ public class Entry {
 
     /**
      * Gives the priority related to background based on the sprite attribute.
-     * @return Priority
+     * @return Priority true if this sprite should be in front of background
      */
-    public int getPriority() {
-        return this.spriteAttribute & 0x20;
+    public boolean getPriority() {
+        return (this.spriteAttribute & 0x20) == 0;
     }
 
     /**

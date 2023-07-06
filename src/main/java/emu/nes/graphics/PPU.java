@@ -129,9 +129,11 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
                 if (mask.showBackground()) {
                     this.renderBackground();
                 }
+                Frame background = new Frame(this.frame);
+                background.setMask(mask);
                 long back = System.currentTimeMillis();
                 if (mask.showSprites()) {
-                    this.renderForeground();
+                    this.renderForeground(background);
                 }
                 long fore = System.currentTimeMillis();
                 this.debug.append(
@@ -186,7 +188,7 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
                         if (pixel > 0) {
                             this.nonzero[xcor + Picture.NES_WIDTH * ycor] = true;
                         }
-                        this.frame.setColor(xcor, ycor, this.bus.read(0x3F00 + color + pixel));
+                        this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F00 + color + pixel));
                     }
                 }
             }
@@ -197,12 +199,13 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
 
     /**
      * Renders sprites.
+     * @param background Rendered background
      */
-    private void renderForeground() {
+    private void renderForeground(final Frame background) {
         for (int idx = 63; idx > 0; --idx) {
-            this.renderSprite(idx);
+            this.renderSprite(idx, background);
         }
-        List<Integer> spriteNonzeros = this.renderSprite(0);
+        List<Integer> spriteNonzeros = this.renderSprite(0, background);
         for (Integer pixel : spriteNonzeros) {
             if (this.nonzero[pixel]) {
                 this.registers.setSpriteZeroHit();
@@ -214,28 +217,69 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
     /**
      * Renders an individual sprite and reports the non zero pixels of this sprite.
      * @param idx Sprite index
+     * @param background Rendered background
      * @return A list of screen pixels that are non zero
      */
-    private List<Integer> renderSprite(int idx) {
-        final Mask mask = this.registers.getMask();
+    private List<Integer> renderSprite(int idx, Frame background) {
         List<Integer> result = new ArrayList<>(64);
         Entry entry = this.oam.entry(idx);
-        Tile tile = this.bus.getTile(
-            this.registers.getControl().getSpriteTableAddress(), entry.spriteTile
-        );
+        final Control control = this.registers.getControl();
+        int bank = control.getSpriteTableAddress();
+        if (control.getSpriteSize() == 16) {
+            bank = entry.spriteTile % 2;
+        }
+        if (control.getSpriteSize() == 16) {
+            if (entry.isFlippedVertically()) {
+                entry.spriteTile = (byte) (entry.spriteTile + 1);
+                result.addAll(this.renderEntry(entry, bank, background));
+                entry.spriteY = (byte) (entry.spriteY + 8);
+                entry.spriteTile = (byte) (entry.spriteTile - 1);
+                result.addAll(this.renderEntry(entry, bank, background));
+                entry.spriteY = (byte) (entry.spriteY - 8);
+            } else {
+                result.addAll(this.renderEntry(entry, bank, background));
+                entry.spriteY = (byte) (entry.spriteY + 8);
+                entry.spriteTile = (byte) (entry.spriteTile + 1);
+                result.addAll(this.renderEntry(entry, bank, background));
+                entry.spriteY = (byte) (entry.spriteY - 8);
+                entry.spriteTile = (byte) (entry.spriteTile - 1);
+            }
+        } else {
+            result.addAll(this.renderEntry(entry, bank, background));
+        }
+        return result;
+    }
+
+    /**
+     * Renders an OAM entry.
+     * @param entry Entry to render
+     * @param bank CHR bank to select tile from
+     * @param background Rendered background
+     * @return A list of screen pixels that are non zero
+     */
+    private List<Integer> renderEntry(Entry entry, int bank, Frame background) {
+        List<Integer> result = new ArrayList<>(64);
+        final Mask mask = this.registers.getMask();
+        Tile tile = this.bus.getTile(bank, entry.spriteTile);
         int startx = entry.spriteX;
         int starty = entry.spriteY;
         int color = 4 * (entry.spriteAttribute & 0x3);
         for (int pixelx = 0; pixelx < 8; ++pixelx) {
             for (int pixely = 0; pixely < 8; ++pixely) {
                 final byte pixel = tile.getPixel(pixelx, pixely);
-                final int xcor = startx + pixelx;
-                final int ycor = starty + pixely;
+                final int xcor = startx + (entry.isFlippedHorizontally() ? 8 - pixelx : pixelx);
+                final int ycor = starty + (entry.isFlippedVertically() ? 8 - pixely : pixely);
                 if(xcor > 7 || mask.showLeftSprites()) {
                     if (pixel > 0) {
                         result.add(xcor + Picture.NES_WIDTH * ycor);
+                        if (entry.getPriority()) {
+                            this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F11 + color + pixel));
+                        } else {
+                            this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
+                        }
+                    } else {
+                        this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
                     }
-                    this.frame.setColor(xcor, ycor, this.bus.read(0x3F11 + color + pixel));
                 }
             }
         }

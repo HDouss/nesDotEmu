@@ -61,7 +61,7 @@ public class Control {
 
     /**
      * Gives the sprite size (8x16 or 8x8).
-     * @return Sprite size returns 8 for 8x8 and 8x16
+     * @return Sprite size returns 8 for 8x8 and 16 for 8x16
      */
     public int getSpriteSize() {
         final int bit = (this.content & 0x20) >> 5;

@@ -96,12 +96,28 @@ public class Frame {
         }
     }
 
+    /**
+     * Builds a frame as a clone of another frame.
+     * @param original Original frame to clone
+     */
+    public Frame(final Frame original) {
+        for(int idx = 0; idx < Picture.NES_WIDTH; ++idx) {
+            this.pixels[idx] = new int[Picture.NES_HEIGHT];
+            for(int jdx = 0; jdx < Picture.NES_HEIGHT; ++jdx) {
+                this.pixels[idx][jdx] = original.getColor(idx, jdx);
+            }
+        }
+    }
     public int getColor(final int xcor, final int ycor) {
         return this.pixels[xcor][ycor];
     }
 
-    public void setColor(final int xcor, final int ycor, int color) {
+    public void setNESColor(final int xcor, final int ycor, int color) {
         this.pixels[xcor][ycor] = this.getRgb(color);
+    }
+
+    public void setColor(final int xcor, final int ycor, int color) {
+        this.pixels[xcor][ycor] = color;
     }
 
     /**
