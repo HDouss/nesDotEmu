@@ -83,6 +83,11 @@ public class Frame {
     private int[][] pixels = new int[Picture.NES_WIDTH][];
 
     /**
+     * PPU Register Mask status.
+     */
+    private Mask mask;
+
+    /**
      * Builds a frame object
      */
     public Frame() {
@@ -100,12 +105,30 @@ public class Frame {
     }
 
     /**
+     * Modifies the mask.
+     * @param mask PPU MASK register
+     */
+    public void setMask(final Mask mask) {
+        this.mask = mask;
+    }
+
+    /**
      * Converts a byte color value to an RGB value.
      * @param color byte color value from 0 to 63.
      * @return An RGB equivalent
      */
     private int getRgb(int color) {
-        return Frame.RGB[color];
+        int result = Frame.RGB[color];
+        if (mask.isGrayscale()) {
+            int alpha = (result >> 24) & 0xff;
+            int red = (result >> 16) & 0xff;
+            int green = (result >> 8) & 0xff;
+            int blue = result & 0xff;
+            int avg = (red + green + blue) / 3;
+            result = (alpha << 24) | (avg << 16) | (avg << 8) | avg;
+        }
+        //TODO: implement emphasize
+        return result;
     }
 
 }
