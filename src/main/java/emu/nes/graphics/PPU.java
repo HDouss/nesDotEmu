@@ -1,5 +1,7 @@
 package emu.nes.graphics;
 
+import java.util.ArrayList;
+import java.util.List;
 import emu.nes.memory.Memory;
 
 /**
@@ -40,6 +42,16 @@ public class PPU implements Memory {
     private Frame frame;
 
     /**
+     * Output PPU debugging info.
+     */
+    private StringBuilder debug = new StringBuilder();
+
+    /**
+     * Non zero background pixels.
+     */
+    private boolean[] nonzero = new boolean[Picture.NES_WIDTH * Picture.NES_HEIGHT];
+
+    /**
      * Builds a PPU with the passed PPU bus.
      * @param bus PPU bus
      */
@@ -68,10 +80,7 @@ public class PPU implements Memory {
         // Modify PPUStatus: Sprite 0 Hit.
         //   Set when a nonzero pixel of sprite 0 overlaps a nonzero background pixel;
         //   cleared at dot 1 of the pre-render line.  Used for raster timing.
-        // Modify PPUStatus: Vertical blank has started (0: not in vblank; 1: in vblank).
-        //   Set at dot 1 of line 241 (the line *after* the post-render
-        //   line); cleared at dot 1 of the
-        //   pre-render line.
+        // 
         // PPUStatus: Sprite 0 hit is not detected at x=255, nor is it detected at x=0 through 7 if the background or sprites are hidden in this area.
         /*
          * OAMADDR is set to 0 during each of ticks 257–320 (the sprite tile loading interval) of the pre-render and visible scanlines.
@@ -117,13 +126,29 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
             this.cycles = 0;
             this.scanline ++;
             if (this.scanline == 241) {
-                this.renderBackground();
-                this.renderForeground();
+                final Mask mask = this.registers.getMask();
+                long now = System.currentTimeMillis();
+                if (mask.showBackground()) {
+                    this.renderBackground();
+                }
+                long back = System.currentTimeMillis();
+                if (mask.showSprites()) {
+                    this.renderForeground();
+                }
+                long fore = System.currentTimeMillis();
+                this.debug.append(
+                    String.format(
+                        "backgroung rendering took %s ms. foreground rendering took %s ms. \n",
+                        back - now, fore - back
+                    )
+                );
                 this.registers.setVBlanck();
             }
             if (this.scanline >= 261) {
                 this.scanline = -1;
                 this.registers.unsetVBlanck();
+                this.registers.unsetSpriteZeroHit();
+                this.nonzero = new boolean[Picture.NES_WIDTH * Picture.NES_HEIGHT];
             }
         }
         
@@ -139,8 +164,9 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         int tileIndex = 0;
         while (tileIndex < 960) {
             int tileNum = this.bus.read(cursor);
-            Tile tile = this.bus.getTile(this.registers.getControl().getBackgroundTableAddress(), tileNum);
-            
+            Tile tile = this.bus.getTile(
+                this.registers.getControl().getBackgroundTableAddress(), tileNum
+            );
             if (tileIndex % 4 == 0 && attrs[tileIndex] == null) {
                 attrAddr++;
                 attributes = this.bus.read(attrAddr);
@@ -151,11 +177,13 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
             int color = 4 * attrs[tileIndex];
             for (int pixelx = 0; pixelx < 8; ++pixelx) {
                 for (int pixely = 0; pixely < 8; ++pixely) {
-                    this.frame.setColor(
-                        startx + pixelx,
-                        starty + pixely,
-                        this.bus.read(0x3F00 + color + tile.getPixel(pixelx, pixely))
-                    );
+                    final byte pixel = tile.getPixel(pixelx, pixely);
+                    final int xcor = startx + pixelx;
+                    final int ycor = starty + pixely;
+                    if (pixel > 0) {
+                        this.nonzero[xcor + Picture.NES_WIDTH * ycor] = true;
+                    }
+                    this.frame.setColor(xcor, ycor, this.bus.read(0x3F00 + color + pixel));
                 }
             }
             cursor++;
@@ -163,25 +191,48 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         }
     }
 
+    /**
+     * Renders sprites.
+     */
     private void renderForeground() {
-        for (int idx = 0; idx < 64; ++idx) {
-            Entry entry = this.oam.entry(idx);
-            Tile tile = this.bus.getTile(
-                this.registers.getControl().getSpriteTableAddress(), entry.spriteTile
-            );
-            int startx = entry.spriteX;
-            int starty = entry.spriteY;
-            int color = 4 * (entry.spriteAttribute & 0x3);
-            for (int pixelx = 0; pixelx < 8; ++pixelx) {
-                for (int pixely = 0; pixely < 8; ++pixely) {
-                    this.frame.setColor(
-                        startx + pixelx,
-                        starty + pixely,
-                        this.bus.read(0x3F04 + color + tile.getPixel(pixelx, pixely))
-                    );
-                }
+        for (int idx = 63; idx > 0; --idx) {
+            this.renderSprite(idx);
+        }
+        List<Integer> spriteNonzeros = this.renderSprite(0);
+        for (Integer pixel : spriteNonzeros) {
+            if (this.nonzero[pixel]) {
+                this.registers.setSpriteZeroHit();
+                break;
             }
         }
+    }
+
+    /**
+     * Renders an individual sprite and reports the non zero pixels of this sprite.
+     * @param idx Sprite index
+     * @return A list of screen pixels that are non zero
+     */
+    private List<Integer> renderSprite(int idx) {
+        List<Integer> result = new ArrayList<>(64);
+        Entry entry = this.oam.entry(idx);
+        Tile tile = this.bus.getTile(
+            this.registers.getControl().getSpriteTableAddress(), entry.spriteTile
+        );
+        int startx = entry.spriteX;
+        int starty = entry.spriteY;
+        int color = 4 * (entry.spriteAttribute & 0x3);
+        for (int pixelx = 0; pixelx < 8; ++pixelx) {
+            for (int pixely = 0; pixely < 8; ++pixely) {
+                final byte pixel = tile.getPixel(pixelx, pixely);
+                final int xcor = startx + pixelx;
+                final int ycor = starty + pixely;
+                if (pixel > 0) {
+                    result.add(xcor + Picture.NES_WIDTH * ycor);
+                }
+                this.frame.setColor(xcor, ycor, this.bus.read(0x3F11 + color + pixel));
+            }
+        }
+        return result;
     }
 
     private void fillAttrs(Byte[] attrs, int index, byte attributes) {
@@ -220,6 +271,10 @@ The PAL PPU blanking on the left and right edges at x=0, x=1, and x=254 (see Ove
         this.cycles = 0;
         this.scanline = 0;
         this.registers.reset();
+    }
+
+    public StringBuilder getDebug() {
+        return debug;
     }
 
 }

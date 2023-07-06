@@ -71,6 +71,7 @@ public class PPURegisters extends ByteMemory {
         }
         if (addr == PPURegisters.PPUSTATUS) {
             this.write(addr, (byte) (result & 0x7F));
+            this.unsetVBlanck();
             this.latch = false;
         }
         return result;
@@ -206,11 +207,31 @@ public class PPURegisters extends ByteMemory {
         super.write(PPURegisters.PPUADDR, (byte) (this.address & 0xFF));
     }
 
+    /**
+     * Sets Vblank flag in PPUSTATUS.
+     */
     public void setVBlanck() {
         this.write(2, (byte) (this.getStatus() | 0x80));
     }
 
+    /**
+     * Clears Vblank flag in PPUSTATUS.
+     */
     public void unsetVBlanck() {
         this.write(2, (byte) (this.getStatus() & 0x7F));
+    }
+
+    /**
+     * Sets Sprite 0 Hit flag in PPUSTATUS.
+     */
+    public void setSpriteZeroHit() {
+        this.write(2, (byte) (this.getStatus() | 0x40));
+    }
+
+    /**
+     * Clears Sprite 0 Hit flag in PPUSTATUS.
+     */
+    public void unsetSpriteZeroHit() {
+        this.write(2, (byte) (this.getStatus() & 0xBF));
     }
 }

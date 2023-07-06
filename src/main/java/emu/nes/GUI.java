@@ -27,9 +27,21 @@ public class GUI extends JFrame {
      * Serial version UID.
      */
     private static final long serialVersionUID = -4646410431880625186L;
+
+    /**
+     * Border Inset.
+     */
     private static final int BORDER_INSET = 5;
+
+    /**
+     * NES screen output.
+     */
     private BufferedImage frame;
 
+    /**
+     * Constructor. Builds the general GUI.
+     * @throws InterruptedException
+     */
     public GUI() throws InterruptedException {
         final NES nes = new NES();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +59,19 @@ public class GUI extends JFrame {
         );
         this.setContentPane(content);
         content.setLayout(new BorderLayout(0, 0));
-        content.add(new JPanel(), BorderLayout.CENTER);
+        final JPanel panel = new JPanel() {
+            /**
+             * Default serial version UID.
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                super.paintComponent(graphics);
+                graphics.drawImage(GUI.this.frame, 2, 50, null);
+            }
+        };
+        content.add(panel, BorderLayout.CENTER);
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
         JButton onoff = new JButton("ON/OFF");
@@ -93,12 +117,6 @@ public class GUI extends JFrame {
             }
         });
         content.add(buttons, BorderLayout.EAST);
-    }
-
-    @Override
-    public void paint(final Graphics graphics) {
-        super.paint(graphics);
-        graphics.drawImage(this.frame, 2, 50, null);
     }
 
     public void setFrame(BufferedImage frame) {

@@ -62,7 +62,7 @@ public class Clock {
                         boolean nmiVblanck = Clock.this.ppu.tick();
                         if (ticks > 0 && ticks % 82180 == 0) {
                             Clock.this.picture.draw(Clock.this.ppu);
-                            //System.out.println(Clock.this.cpu.getOutput());
+                            System.out.println(Clock.this.ppu.getDebug());
                             if (nmiVblanck) {
                                 Clock.this.cpu.nmi();
                             }
