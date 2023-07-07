@@ -15,12 +15,12 @@ public class Entry {
     /**
      * Sprite Y coordinate.
      */
-    byte spriteY;
+    int spriteY;
 
     /**
      * Sprite Tile identifier.
      */
-    byte spriteTile;
+    int spriteTile;
 
     /**
      * Sprite attribute. 
@@ -30,7 +30,7 @@ public class Entry {
     /**
      * Sprite X coordinate.
      */
-    byte spriteX;
+    int spriteX;
 
     /**
      * Gives the palette index based on the sprite attribute.

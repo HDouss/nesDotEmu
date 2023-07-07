@@ -97,6 +97,7 @@ public class PPU implements Memory {
                 if (mask.showSprites()) {
                     this.renderForeground(background);
                 }
+                //this.renderCHR();
                 long fore = System.currentTimeMillis();
                 this.debug.append(
                     String.format(
@@ -132,7 +133,7 @@ public class PPU implements Memory {
         while (tileIndex < 960) {
             int tileNum = this.bus.read(cursor);
             Tile tile = this.bus.getTile(
-                this.registers.getControl().getBackgroundTableAddress(), tileNum
+                this.registers.getControl().getBackgroundTableBank(), tileNum
             );
             if (tileIndex % 4 == 0 && attrs[tileIndex] == null) {
                 attrAddr++;
@@ -157,6 +158,32 @@ public class PPU implements Memory {
                 }
             }
             cursor++;
+            tileIndex++;
+        }
+    }
+
+    /**
+     * Renders all CHR content.
+     */
+    private void renderCHR() {
+        int bank = 0;
+        int tileIndex = 0;
+        while (tileIndex < 256 || bank < 1) {
+            if(tileIndex == 256) {
+                bank = 1;
+                tileIndex = 0;
+            }
+            Tile tile = this.bus.getTile(bank, tileIndex);
+            
+            int startx = bank* 8 * 16 + ((tileIndex)%16)*8;
+            int starty = ((tileIndex )/ 16) * 8;
+            
+            for (int pixelx = 0; pixelx < 8; ++pixelx) {
+                for (int pixely = 0; pixely < 8; ++pixely) {
+                    final byte pixel = tile.getPixel(pixelx, pixely);
+                        this.frame.setNESColor(startx + pixelx, starty + pixely, 16+pixel*3);
+                }
+            }
             tileIndex++;
         }
     }
@@ -196,17 +223,17 @@ public class PPU implements Memory {
             if (entry.isFlippedVertically()) {
                 entry.spriteTile = (byte) (entry.spriteTile + 1);
                 result.addAll(this.renderEntry(entry, bank, background));
-                entry.spriteY = (byte) (entry.spriteY + 8);
-                entry.spriteTile = (byte) (entry.spriteTile - 1);
+                entry.spriteY = entry.spriteY + 8;
+                entry.spriteTile = entry.spriteTile - 1;
                 result.addAll(this.renderEntry(entry, bank, background));
-                entry.spriteY = (byte) (entry.spriteY - 8);
+                entry.spriteY = entry.spriteY - 8;
             } else {
                 result.addAll(this.renderEntry(entry, bank, background));
-                entry.spriteY = (byte) (entry.spriteY + 8);
-                entry.spriteTile = (byte) (entry.spriteTile + 1);
+                entry.spriteY = entry.spriteY + 8;
+                entry.spriteTile = entry.spriteTile + 1;
                 result.addAll(this.renderEntry(entry, bank, background));
-                entry.spriteY = (byte) (entry.spriteY - 8);
-                entry.spriteTile = (byte) (entry.spriteTile - 1);
+                entry.spriteY = entry.spriteY - 8;
+                entry.spriteTile = entry.spriteTile - 1;
             }
         } else {
             result.addAll(this.renderEntry(entry, bank, background));
@@ -227,12 +254,15 @@ public class PPU implements Memory {
         Tile tile = this.bus.getTile(bank, entry.spriteTile);
         int startx = entry.spriteX;
         int starty = entry.spriteY;
-        int color = 4 * (entry.spriteAttribute & 0x3);
+        int color = 4 * entry.getPalette();
         for (int pixelx = 0; pixelx < 8; ++pixelx) {
             for (int pixely = 0; pixely < 8; ++pixely) {
                 final byte pixel = tile.getPixel(pixelx, pixely);
                 final int xcor = startx + (entry.isFlippedHorizontally() ? 8 - pixelx : pixelx);
                 final int ycor = starty + (entry.isFlippedVertically() ? 8 - pixely : pixely);
+                if(xcor < 0 || xcor > Picture.NES_WIDTH -1 || ycor < 0 || ycor > Picture.NES_HEIGHT -1) {
+                    continue;
+                }
                 if(xcor > 7 || mask.showLeftSprites()) {
                     if (pixel > 0) {
                         result.add(xcor + Picture.NES_WIDTH * ycor);
@@ -255,9 +285,9 @@ public class PPU implements Memory {
             for(int colum = 0; colum < 4; ++colum) {
                 final int tileIndex = colum + 32 * row;
                 if (tileIndex + index < 960) {
-                attrs[tileIndex + index] = (byte) (
-                    (attributes >> ((tileIndex % 32) / 2 + tileIndex / 64)) & 0x3
-                );
+                    attrs[tileIndex + index] = (byte) (
+                        (attributes >> (2 * (colum / 2) + 4 * (row / 2))) & 0x3
+                    );
                 }
             }
         }
@@ -275,7 +305,8 @@ public class PPU implements Memory {
      * @param data Data to write
      */
     public void writeOAM(final byte data) {
-        this.oam.write(this.registers.getOamAddress(), data);
+        this.oam.write(this.registers.getOamAddress() & 0xFF, data);
+        this.registers.write(0x2003, (byte) (this.registers.getOamAddress() + 1));
     }
 
     /**

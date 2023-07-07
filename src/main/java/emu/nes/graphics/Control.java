@@ -54,9 +54,8 @@ public class Control {
      * Gives the background pattern table address.
      * @return Background pattern table address
      */
-    public int getBackgroundTableAddress() {
-        final int bit = (this.content & 0x10) >> 4;
-        return bit * 0x1000;
+    public int getBackgroundTableBank() {
+        return (this.content & 0x10) >> 4;
     }
 
     /**

@@ -18,10 +18,10 @@ public class OAM extends ByteMemory {
      */
     public Entry entry(final int idx) {
         final Entry result = new Entry();
-        result.spriteY = this.read(idx * 4);
-        result.spriteTile = this.read(idx * 4 + 1);
+        result.spriteY = this.read(idx * 4) & 0xFF;
+        result.spriteTile = this.read(idx * 4 + 1) & 0xFF;
         result.spriteAttribute = this.read(idx * 4 + 2);
-        result.spriteX = this.read(idx * 4 + 3);
+        result.spriteX = this.read(idx * 4 + 3) & 0xFF;
         return result;
     }
 }

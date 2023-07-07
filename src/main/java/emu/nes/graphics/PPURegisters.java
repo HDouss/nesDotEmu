@@ -25,11 +25,6 @@ public class PPURegisters extends ByteMemory {
     private static final int PPUSTATUS = 2;
 
     /**
-     * OAMADDR register address.
-     */
-    private static final int OAMADDR = 3;
-
-    /**
      * OAMDATA register address.
      */
     private static final int OAMDATA = 4;
@@ -100,7 +95,6 @@ public class PPURegisters extends ByteMemory {
         }
         if (addr == PPURegisters.OAMDATA) {
             ppu.writeOAM(value);
-            super.write(PPURegisters.OAMADDR, (byte) (super.read(PPURegisters.OAMADDR) + 1));
         }
         if (addr == PPURegisters.PPUSCROLL) {
             if (!this.latch) {

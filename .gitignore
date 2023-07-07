@@ -1,5 +1,6 @@
 .project
 .classpath
 .settings/*.*
+src/main/resources/testing/games/*
 /target/
 /bin/
