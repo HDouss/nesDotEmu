@@ -99,12 +99,12 @@ public class PPU implements Memory {
                 }
                 //this.renderCHR();
                 long fore = System.currentTimeMillis();
-                this.debug.append(
+                /*this.debug.append(
                     String.format(
                         "backgroung rendering took %s ms. foreground rendering took %s ms. \n",
                         back - now, fore - back
                     )
-                );
+                );*/
                 this.registers.setVBlanck();
             }
             if (this.scanline >= 261) {
@@ -267,7 +267,7 @@ public class PPU implements Memory {
                     if (pixel > 0) {
                         result.add(xcor + Picture.NES_WIDTH * ycor);
                         if (entry.getPriority()) {
-                            this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F11 + color + pixel));
+                            this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F10 + color + pixel));
                         } else {
                             this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
                         }
