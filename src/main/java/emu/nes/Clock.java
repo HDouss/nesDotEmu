@@ -59,11 +59,11 @@ public class Clock {
                     long duration = now - last;
                     if (duration > Clock.PERIOD) {
                         last = now;
-                        boolean nmiVblanck = Clock.this.ppu.tick();
-                        if (ticks > 0 && ticks % 82180 == 0) {
+                        boolean drawn = Clock.this.ppu.tick();
+                        if (drawn) {
                             Clock.this.picture.draw(Clock.this.ppu);
                             //System.out.println(Clock.this.ppu.getDebug());
-                            if (nmiVblanck) {
+                            if (Clock.this.ppu.nmiVBlank()) {
                                 Clock.this.cpu.nmi();
                             }
                         }

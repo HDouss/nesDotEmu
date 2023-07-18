@@ -31,6 +31,7 @@ public class Cartridge implements Memory {
     }
 
     public Tile getTile(final int bank, final int num) {
+        //System.out.println(String.format("getting tile %s from bank %s", num, bank));
         return this.content.getTile(bank, num);
     }
 

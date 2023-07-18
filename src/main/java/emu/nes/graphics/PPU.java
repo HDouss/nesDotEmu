@@ -64,7 +64,7 @@ public class PPU implements Memory {
 
     @Override
     public byte read(final int addr) {
-        return this.registers.read(addr);
+        return this.registers.read(addr, this);
     }
 
     @Override
@@ -78,6 +78,7 @@ public class PPU implements Memory {
      */
     public boolean tick() {
         this.cycles ++;
+        boolean result = false;
         if (this.cycles >= 257 && this.cycles <= 320 && this.scanline < 240) {
             this.registers.write(3, (byte) 0);
         }
@@ -106,6 +107,7 @@ public class PPU implements Memory {
                     )
                 );*/
                 this.registers.setVBlanck();
+                result = true;
             }
             if (this.scanline >= 261) {
                 this.scanline = -1;
@@ -114,6 +116,14 @@ public class PPU implements Memory {
                 this.nonzero = new boolean[Picture.NES_WIDTH * Picture.NES_HEIGHT];
             }
         }
+        return result;
+    }
+
+    /**
+     * Returns whether NMI should be issued at vblank.
+     * @return A boolean indicating if an NMI should be issued at vblank.
+     */
+    public boolean nmiVBlank() {
         return this.registers.getControl().isNMIAtVblank();
     }
 
@@ -131,10 +141,11 @@ public class PPU implements Memory {
         int hscroll = this.registers.getHorizontalScroll();
         int vscroll = this.registers.getVerticalScroll();
         while (tileIndex < 960) {
-            int tileNum = this.bus.read(cursor);
+            int tileNum = (this.bus.read(cursor) & 0xFF);
             Tile tile = this.bus.getTile(
                 this.registers.getControl().getBackgroundTableBank(), tileNum
             );
+            //System.out.println(String.format("Getting tile %s from bank %s", tileNum, this.registers.getControl().getBackgroundTableBank()));
             if (tileIndex % 4 == 0 && attrs[tileIndex] == null) {
                 attrAddr++;
                 attributes = this.bus.read(attrAddr);
@@ -296,7 +307,6 @@ public class PPU implements Memory {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
         return super.toString() + this.bus.toString() + this.oam.toString();
     }
 
@@ -316,16 +326,28 @@ public class PPU implements Memory {
     public PPUBus bus() {
         return this.bus;
     }
+
+    /**
+     * Accessor for the frame drawn.
+     * @return Drawn frame
+     */
     public Frame getFrame() {
         return this.frame;
     }
 
+    /**
+     * Turns the PPU off. Resets registers.
+     */
     public void off() {
         this.cycles = 0;
         this.scanline = 0;
         this.registers.reset();
     }
 
+    /**
+     * Accessor for the written debugging information.
+     * @return Debugging info
+     */
     public StringBuilder getDebug() {
         return debug;
     }

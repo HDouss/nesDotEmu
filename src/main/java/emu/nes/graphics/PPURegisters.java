@@ -40,9 +40,14 @@ public class PPURegisters extends ByteMemory {
     private boolean latch = false;
 
     /**
-     * Memory Address combined.
+     * VRAM Address combined.
      */
-    private int address = 0x0000;
+    private int vram = 0x0000;
+
+    /**
+     * Temporary latched address.
+     */
+    private int temp = 0x0000;
 
     /**
      * Scroll horizontal value.
@@ -54,18 +59,40 @@ public class PPURegisters extends ByteMemory {
      */
     private int scrolly = 0;
 
+    /**
+     * Buffer of VRAM read data.
+     */
+    private byte buffer;
+
+    /**
+     * Builds a byte memory with 8 bytes.
+     */
     public PPURegisters() {
         super(8);
     }
 
-    @Override
-    public byte read(final int addr) {
-        final byte result = super.read(addr);
+    /**
+     * Makes a read and handle special cases for PPUDATA and PPUSTATUS read.
+     * @param addr Address to read
+     * @param ppu PPU
+     * @return Data read
+     */
+    public byte read(final int addr, final PPU ppu) {
+        byte result = super.read(addr);
         if (addr == PPURegisters.PPUDATA) {
+            result = this.buffer;
+            this.buffer = ppu.bus().read(this.vram);
+            if (this.vram > 0x3EFF) {
+                result = this.buffer;
+            }
+            System.out.println(String.format(
+                "returning value %02X, buffer is %02X from address %04X",
+                result, this.buffer, this.vram
+            )
+                );
             this.incrementAddress();
         }
         if (addr == PPURegisters.PPUSTATUS) {
-            this.write(addr, (byte) (result & 0x7F));
             this.unsetVBlanck();
             this.latch = false;
         }
@@ -82,21 +109,28 @@ public class PPURegisters extends ByteMemory {
         super.write(addr, value);
         if (addr == PPURegisters.PPUADDR) {
             if (!this.latch) {
-                this.address = (value & 0xFF) << 8;
+                this.temp = ((value & 0x3F) << 8) + (this.temp & 0xFF);
             } else {
-                this.address = this.address + (value & 0xFF);
-                super.write(PPURegisters.PPUDATA, ppu.bus().read(this.address));
+                this.temp = (this.temp & 0x7F00) | (value & 0xFF);
+                this.vram = this.temp;
             }
             this.latch = !this.latch;
         }
         if (addr == PPURegisters.PPUDATA) {
-            ppu.bus().write(this.address, value);
+            
+            /*System.out.println(String.format(
+                "writing value %02X  to address %04X",
+                value, this.vram
+            )
+                );*/
+            ppu.bus().write(this.vram, value);
             this.incrementAddress();
         }
         if (addr == PPURegisters.OAMDATA) {
             ppu.writeOAM(value);
         }
         if (addr == PPURegisters.PPUSCROLL) {
+            //verify fine and coarse
             if (!this.latch) {
                 this.scrollx = value;
             } else {
@@ -198,8 +232,8 @@ public class PPURegisters extends ByteMemory {
      */
     private void incrementAddress() {
         int increment = this.getControl().addressIncrement();
-        this.address = this.address + increment;
-        super.write(PPURegisters.PPUADDR, (byte) (this.address & 0xFF));
+        this.vram = this.vram + increment;
+        super.write(PPURegisters.PPUADDR, (byte) (this.vram & 0xFF));
     }
 
     /**

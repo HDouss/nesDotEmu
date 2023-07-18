@@ -68,7 +68,7 @@ public class GUI extends JFrame {
             @Override
             protected void paintComponent(Graphics graphics) {
                 super.paintComponent(graphics);
-                graphics.drawImage(GUI.this.frame, 2, 50, null);
+                graphics.drawImage(GUI.this.frame, 2, 2, null);
             }
         };
         content.add(panel, BorderLayout.CENTER);
@@ -98,7 +98,16 @@ public class GUI extends JFrame {
                     nes.insert(
                         new Cartridge(
                             Paths.get(
-                                ClassLoader.getSystemResource("testing/classic/nestest.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/classic/nestest.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/chipndale.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/contra.nes").toURI()
+                                ClassLoader.getSystemResource("testing/games/mario.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/mario2.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/mario3.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/smurfs.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/zelda.nes").toURI()
+                                //ClassLoader.getSystemResource("testing/games/zelda2.nes").toURI()
+                                
                             )
                         )
                     );

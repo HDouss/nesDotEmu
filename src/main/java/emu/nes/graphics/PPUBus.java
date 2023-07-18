@@ -20,9 +20,11 @@ public class PPUBus extends SelectorByteMemory {
     private static final int NAMETABLE_START_ADDRESS = 0x2000;
 
     /**
-     * Cartridge starting addressing range.
+     * Implementation trick (hack). This will make any read/write from PPU detected
+     * as starting beyond address 0xFFFF. For now, this is the only way for
+     * the cartridge implementation to differentiate ppu from cpu access.
      */
-    private static final int CARTRIDGE_START_ADDRESS = 0x0000;
+    private static final int CARTRIDGE_START_ADDRESS = - 0xBFE0;
 
     /**
      * An optionally inserted cartridge.
