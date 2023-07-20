@@ -18,7 +18,7 @@ public class Picture {
     /**
      * Magnifying factor.
      */
-    private static final int FACTOR = 3;
+    private static final int FACTOR = 2;
 
     /**
      * GUI screen video output height in pixels. 
