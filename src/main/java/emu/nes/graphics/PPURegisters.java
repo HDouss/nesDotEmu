@@ -85,11 +85,11 @@ public class PPURegisters extends ByteMemory {
             if (this.vram > 0x3EFF) {
                 result = this.buffer;
             }
-            System.out.println(String.format(
+            /*System.out.println(String.format(
                 "returning value %02X, buffer is %02X from address %04X",
                 result, this.buffer, this.vram
             )
-                );
+                );*/
             this.incrementAddress();
         }
         if (addr == PPURegisters.PPUSTATUS) {

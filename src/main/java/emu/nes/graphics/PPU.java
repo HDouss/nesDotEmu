@@ -135,12 +135,12 @@ public class PPU implements Memory {
         int cursor = this.registers.getControl().getNametableAddress();
         int attrAddr = cursor + 0x03C0;
         byte attributes = this.bus.read(attrAddr);
-        Byte[] attrs = new Byte[960];
+        Byte[] attrs = new Byte[960 * 4];
         this.fillAttrs(attrs, 0, attributes);
         int tileIndex = 0;
         int hscroll = this.registers.getHorizontalScroll();
         int vscroll = this.registers.getVerticalScroll();
-        while (tileIndex < 960) {
+        while (tileIndex < 960 * 4) {
             int tileNum = (this.bus.read(cursor) & 0xFF);
             Tile tile = this.bus.getTile(
                 this.registers.getControl().getBackgroundTableBank(), tileNum
@@ -170,6 +170,10 @@ public class PPU implements Memory {
             }
             cursor++;
             tileIndex++;
+            if (tileIndex % 960 == 0) {
+                tileIndex += 64;
+                cursor += 64;
+            }
         }
     }
 
@@ -295,7 +299,7 @@ public class PPU implements Memory {
         for(int row = 0; row < 4; ++row) {
             for(int colum = 0; colum < 4; ++colum) {
                 final int tileIndex = colum + 32 * row;
-                if (tileIndex + index < 960) {
+                if (tileIndex + index < 960 *4) {
                     attrs[tileIndex + index] = (byte) (
                         (attributes >> (2 * (colum / 2) + 4 * (row / 2))) & 0x3
                     );
