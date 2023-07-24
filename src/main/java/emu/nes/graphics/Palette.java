@@ -31,8 +31,8 @@ public class Palette extends ByteMemory {
         if (addr % 4 == 0 && addr > 15) {
             return addr - 16;
         }
-        /*if (addr % 4 == 0 && addr > 3) {
-            return 4;
+        /*if (addr % 4 == 0 && addr < 16) {
+            return 0;
         }*/
         return addr;
     }

@@ -23,7 +23,7 @@ public class Control {
      * @return Address increment amount
      */
     public int addressIncrement() {
-        return (this.content & 0x100) > 0 ? 32 : 1;
+        return (this.content & 0x04) > 0 ? 32 : 1;
     }
 
     /**

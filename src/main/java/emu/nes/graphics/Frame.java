@@ -101,11 +101,9 @@ public class Frame {
      * @param original Original frame to clone
      */
     public Frame(final Frame original) {
-        for(int idx = 0; idx < Picture.NES_WIDTH; ++idx) {
+        for(int idx = 0; idx < original.pixels.length; ++idx) {
             this.pixels[idx] = new int[Picture.NES_HEIGHT];
-            for(int jdx = 0; jdx < Picture.NES_HEIGHT; ++jdx) {
-                this.pixels[idx][jdx] = original.getColor(idx, jdx);
-            }
+            System.arraycopy(original.pixels[idx], 0, this.pixels[idx], 0, Picture.NES_HEIGHT);
         }
     }
 

@@ -82,30 +82,22 @@ public class PPU implements Memory {
         if (this.cycles >= 257 && this.cycles <= 320 && this.scanline < 240) {
             this.registers.write(3, (byte) 0);
         }
+        if (this.cycles < 256 && this.scanline >=0 && this.scanline < 240) {
+            final Mask mask = this.registers.getMask();
+            this.frame.setMask(mask);
+            if (mask.showBackground()) {
+                this.renderBackground();
+            }
+            Frame background = new Frame(this.frame);
+            background.setMask(mask);
+            if (mask.showSprites()) {
+                this.renderForeground(background);
+            }
+        }
         if (this.cycles >= 341) {
             this.cycles = 0;
             this.scanline ++;
             if (this.scanline == 241) {
-                final Mask mask = this.registers.getMask();
-                this.frame.setMask(mask);
-                long now = System.currentTimeMillis();
-                if (mask.showBackground()) {
-                    this.renderBackground();
-                }
-                Frame background = new Frame(this.frame);
-                background.setMask(mask);
-                long back = System.currentTimeMillis();
-                if (mask.showSprites()) {
-                    this.renderForeground(background);
-                }
-                //this.renderCHR();
-                long fore = System.currentTimeMillis();
-                /*this.debug.append(
-                    String.format(
-                        "backgroung rendering took %s ms. foreground rendering took %s ms. \n",
-                        back - now, fore - back
-                    )
-                );*/
                 this.registers.setVBlanck();
                 result = true;
             }
@@ -114,6 +106,7 @@ public class PPU implements Memory {
                 this.registers.unsetVBlanck();
                 this.registers.unsetSpriteZeroHit();
                 this.nonzero = new boolean[Picture.NES_WIDTH * Picture.NES_HEIGHT];
+                this.frame = new Frame();
             }
         }
         return result;
@@ -131,50 +124,43 @@ public class PPU implements Memory {
      * Renders background.
      */
     private void renderBackground() {
-        final Mask mask = this.registers.getMask();
-        int cursor = this.registers.getControl().getNametableAddress();
-        int attrAddr = cursor + 0x03C0;
-        byte attributes = this.bus.read(attrAddr);
-        Byte[] attrs = new Byte[960 * 4];
-        this.fillAttrs(attrs, 0, attributes);
-        int tileIndex = 0;
+        if(this.cycles < 8 && !this.registers.getMask().showLeftBackground()) {
+            return;
+        }
         int hscroll = this.registers.getHorizontalScroll();
         int vscroll = this.registers.getVerticalScroll();
-        while (tileIndex < 960 * 4) {
-            int tileNum = (this.bus.read(cursor) & 0xFF);
-            Tile tile = this.bus.getTile(
-                this.registers.getControl().getBackgroundTableBank(), tileNum
-            );
-            //System.out.println(String.format("Getting tile %s from bank %s", tileNum, this.registers.getControl().getBackgroundTableBank()));
-            if (tileIndex % 4 == 0 && attrs[tileIndex] == null) {
-                attrAddr++;
-                attributes = this.bus.read(attrAddr);
-                this.fillAttrs(attrs, tileIndex, attributes);
-            }
-            int startx = (tileIndex % 32) * 8;
-            int starty = (tileIndex / 32) * 8;
-            int color = 4 * attrs[tileIndex];
-            for (int pixelx = 0; pixelx < 8; ++pixelx) {
-                for (int pixely = 0; pixely < 8; ++pixely) {
-                    final byte pixel = tile.getPixel(pixelx, pixely);
-                    final int xcor = startx + pixelx - hscroll;
-                    final int ycor = starty + pixely - vscroll;
-                    if(xcor > 7 || mask.showLeftBackground()) {
-                        final int index = xcor + Picture.NES_WIDTH * ycor;
-                        if (pixel > 0 && index > -1 && index < Picture.NES_WIDTH * Picture.NES_HEIGHT) {
-                            this.nonzero[index] = true;
-                        }
-                        this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F00 + color + pixel));
-                    }
-                }
-            }
-            cursor++;
-            tileIndex++;
-            if (tileIndex % 960 == 0) {
-                tileIndex += 64;
-                cursor += 64;
-            }
+        int cursor = this.registers.getControl().getNametableAddress();
+        int xcor = (hscroll + this.cycles) % (Picture.NES_WIDTH * 2);
+        int ycor = (vscroll + this.scanline) % (Picture.NES_HEIGHT * 2);
+        cursor += (xcor / Picture.NES_WIDTH) * 0x400 + (ycor / Picture.NES_HEIGHT) * 0x800;
+        // Coordinates relative to selected nametable (cursor)
+        // which has the same size as the screen
+        int xcorRel = xcor % Picture.NES_WIDTH;
+        int ycorRel = ycor % Picture.NES_HEIGHT;
+        // tile index in memory
+        int tileIndex = (xcorRel / 8) + 32 * (ycorRel / 8);
+        int tileNum = this.bus.read(cursor + tileIndex) & 0xFF;
+        // attributes index
+        int attrIndex = (tileIndex / 4) % 8 + (tileIndex / 128) * 8;
+        // attributes address
+        int attrAddr = cursor + 0x03C0 + attrIndex;
+        byte attributes = this.bus.read(attrAddr);
+        // tile position inside the 16*16 tile (bottom right is 3, top left is 0)
+        int pos = (tileIndex % 4) / 2 + 2 * (((tileIndex / 32) % 4) / 2);
+        int color = (attributes >> (pos * 2)) & 3;
+        Tile tile = this.bus.getTile(
+            this.registers.getControl().getBackgroundTableBank(), tileNum
+        );
+        final byte pixel = tile.getPixel(xcorRel % 8, ycorRel % 8);
+        final int index = this.cycles + Picture.NES_WIDTH * this.scanline;
+        if (pixel > 0) {
+            this.nonzero[index] = true;
+        } else {
+            color = 0;
         }
+        this.frame.setNESColor(
+            this.cycles, this.scanline, this.bus.read(0x3F00 + 4 * color + pixel)
+        );
     }
 
     /**
@@ -229,6 +215,10 @@ public class PPU implements Memory {
     private List<Integer> renderSprite(int idx, Frame background) {
         List<Integer> result = new ArrayList<>(64);
         Entry entry = this.oam.entry(idx);
+        if(this.cycles < entry.spriteX || this.cycles > entry.spriteX + 8
+            || this.scanline < entry.spriteY || this.scanline > entry.spriteY + 8) {
+            return result;
+        }
         final Control control = this.registers.getControl();
         int bank = control.getSpriteTableAddress();
         if (control.getSpriteSize() == 16) {
@@ -353,7 +343,7 @@ public class PPU implements Memory {
      * @return Debugging info
      */
     public StringBuilder getDebug() {
-        return debug;
+        return this.debug;
     }
 
 }
