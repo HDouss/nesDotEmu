@@ -209,7 +209,7 @@ public class PPURegisters extends ByteMemory {
      * @return Horizontal scroll value.
      */
     public int getHorizontalScroll() {
-        return this.scrollx;
+        return this.scrollx & 0xFF;
     }
 
     /**
@@ -217,7 +217,7 @@ public class PPURegisters extends ByteMemory {
      * @return Vertical scroll value.
      */
     public int getVerticalScroll() {
-        return this.scrolly;
+        return this.scrolly & 0xFF;
     }
 
     public void reset() {

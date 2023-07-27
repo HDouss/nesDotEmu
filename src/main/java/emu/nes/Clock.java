@@ -62,7 +62,7 @@ public class Clock {
                         boolean drawn = Clock.this.ppu.tick();
                         if (drawn) {
                             Clock.this.picture.draw(Clock.this.ppu);
-                            //System.out.println(Clock.this.ppu.getDebug());
+                            //System.out.println("drawn at tick " + ticks);
                             if (Clock.this.ppu.nmiVBlank()) {
                                 Clock.this.cpu.nmi();
                             }

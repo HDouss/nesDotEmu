@@ -73,8 +73,8 @@ public class PPU implements Memory {
     }
 
     /**
-     * Called on each clock tick. Return true if a NMI cpu interrupt should occur.
-     * @return Whether a NMI cpu interrupt should occur.
+     * Called on each clock tick. Return true if a frame is completed drawing.
+     * @return Whether a frame finished drawing
      */
     public boolean tick() {
         this.cycles ++;
@@ -88,10 +88,10 @@ public class PPU implements Memory {
             if (mask.showBackground()) {
                 this.renderBackground();
             }
-            Frame background = new Frame(this.frame);
-            background.setMask(mask);
+            //Frame background = new Frame(this.frame);
+            //background.setMask(mask);
             if (mask.showSprites()) {
-                this.renderForeground(background);
+                this.renderForeground(null);//background);
             }
         }
         if (this.cycles >= 341) {
@@ -219,6 +219,9 @@ public class PPU implements Memory {
             || this.scanline < entry.spriteY || this.scanline > entry.spriteY + 8) {
             return result;
         }
+        /*if(this.cycles != entry.spriteX || this.scanline != entry.spriteY) {
+            return result;
+        }*/
         final Control control = this.registers.getControl();
         int bank = control.getSpriteTableAddress();
         if (control.getSpriteSize() == 16) {
@@ -271,13 +274,13 @@ public class PPU implements Memory {
                 if(xcor > 7 || mask.showLeftSprites()) {
                     if (pixel > 0) {
                         result.add(xcor + Picture.NES_WIDTH * ycor);
-                        if (entry.getPriority()) {
+                        if (entry.getPriority() || !this.nonzero[xcor + ycor * Picture.NES_WIDTH]) {
                             this.frame.setNESColor(xcor, ycor, this.bus.read(0x3F10 + color + pixel));
                         } else {
-                            this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
+                            //this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
                         }
                     } else {
-                        this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
+                        //this.frame.setColor(xcor, ycor, background.getColor(xcor, ycor));
                     }
                 }
             }
